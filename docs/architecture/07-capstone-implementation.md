@@ -1,9 +1,10 @@
 # Capstone Implementation Plan
-## 8-Week Development Timeline
+## 8-Week Development Timeline (Near-Zero Cost)
 
 **Target**: Functional prototype for academic demonstration  
 **Team**: 2-3 students  
-**Scope**: Simplified architecture (5-10 users)
+**Scope**: Simplified architecture (5-10 users)  
+**Budget**: < $15/month (using free tiers)
 
 ---
 
@@ -18,11 +19,11 @@
 │    │              │              │              │                            │
 │    ▼              ▼              ▼              ▼                            │
 │  ████████      ████████      ████████      ████████                         │
-│  FOUNDATION    GENERATION    INTEGRATION   POLISH                           │
+│  FOUNDATION    DATA INTAKE   GENERATION    POLISH                           │
 │                                                                              │
-│  • Setup       • Graph data   • Agents      • Testing                       │
-│  • Database    • APIs         • Frontend    • Demo prep                     │
-│  • Backend     • Validation   • Feedback    • Docs                          │
+│  • Setup       • Scraping     • AI APIs     • Testing                       │
+│  • Database    • Logo check   • Frontend    • Demo prep                     │
+│  • Backend     • Product add  • Feedback    • Docs                          │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -35,6 +36,7 @@
 - Development environment ready
 - Database operational
 - Basic API framework
+- Free tier accounts created
 
 ### Tasks
 
@@ -42,192 +44,250 @@
 
 ```yaml
 Day 1-2: Environment Setup
-  □ Install Docker Desktop
-  □ Set up Python 3.11 virtual environment
+  □ Install Python 3.11 (with virtual environment)
   □ Install Node.js 18+
   □ Create GitHub repository
   □ Set up project structure
+  □ Create free accounts:
+    - Neo4j Aura (aura.neo4j.io) - FREE tier
+    - Hugging Face (huggingface.co) - FREE tier
+    - Groq (groq.com) - FREE tier
+    - Vercel (vercel.com) - FREE tier
+    - Railway (railway.app) - FREE tier
+    - Cloudflare R2 (cloudflare.com) - FREE tier
   
 Day 3-4: Database Setup
-  □ Pull Neo4j Community Edition Docker image
-  □ Configure Neo4j (neo4j.conf)
-  □ Install APOC plugin
-  □ Set up vector index configuration
+  □ Create Neo4j Aura FREE instance (50K nodes)
+  □ Get connection credentials
+  □ Test connection from Python (neo4j driver)
+  □ Learn basic Cypher queries
   
 Day 5-7: Backend Foundation
   □ Initialize FastAPI project
-  □ Set up SQLAlchemy (if needed for users)
-  □ Create Neo4j driver connection
+  □ Create Neo4j connection module
   □ Build health check endpoint
-  □ Set up pytest for testing
+  □ Set up environment variables (.env)
+  □ Create basic error handling
 ```
 
-#### Week 2: Core Backend + Graph Schema
+#### Week 2: Core Backend + Web Scraping Module
 
 ```yaml
-Day 1-3: Graph Schema Implementation
-  □ Define Cypher schema:
-    - Brand nodes (name, industry, colors, fonts)
-    - Asset nodes (images, logos, guidelines)
-    - Campaign nodes
-    - Preference relationships
-  □ Create schema initialization script
-  □ Write sample data loader (3-5 demo brands)
+Day 1-3: Web Scraping Implementation
+  □ Install scraping libraries:
+    - pip install requests beautifulsoup4 pillow colorthief
+  □ Create scraper module:
+    - scrape_website(url) → company info
+    - extract_logo(url) → logo image
+    - extract_colors(image) → color palette
+  □ Handle edge cases:
+    - Website blocks scraping
+    - Logo not found
+    - Invalid URL
   
-Day 4-5: API Endpoints
-  □ POST /api/brands - Create brand
-  □ GET /api/brands/{id} - Get brand details
-  □ POST /api/brands/{id}/assets - Upload assets
-  □ GET /api/brands/{id}/context - Get brand context
+Day 4-5: Image Quality Checker
+  □ Create quality assessment module:
+    - check_resolution(image) → bool (min 200x200)
+    - check_blur(image) → float (Laplacian variance)
+    - check_format(image) → string (PNG/JPG/SVG)
+    - calculate_quality_score(image) → 0.0-1.0
+  □ Define quality thresholds:
+    - > 0.7: Good quality ✓
+    - 0.4 - 0.7: Acceptable ⚠️
+    - < 0.4: Poor quality ❌
   
-Day 6-7: External API Integration
-  □ Set up OpenAI client (GPT-4o-mini)
-  □ Set up Replicate client (SDXL)
-  □ Create environment variable management
-  □ Test API connections
-  □ Handle rate limiting and errors
+Day 6-7: API Endpoints (Data Intake)
+  □ POST /api/brands/scrape
+    - Input: { "website_url": "https://example.com" }
+    - Output: { "company_name", "logo_url", "colors", "quality_score" }
+  □ POST /api/brands/upload-logo
+    - Input: FormData with image file
+    - Output: { "logo_url", "quality_score" }
+  □ POST /api/brands/generate-logo
+    - Input: { "company_description": "..." }
+    - Output: { "generated_logo_url" }
 ```
 
 ### Deliverables
 ✓ Working FastAPI backend  
-✓ Neo4j database with schema  
-✓ 3 demo brands loaded  
-✓ External API connections tested
+✓ Neo4j Aura FREE connected  
+✓ Web scraping module working
+✓ Image quality checker working
+✓ All free tier accounts ready
 
 ---
 
-## Week 3-4: Generation Pipeline
+## Week 3-4: Data Intake Pipeline
 
 ### Goals
-- Image and text generation working
-- Brand context retrieval from graph
-- Basic validation
+- Complete brand onboarding flow
+- Product/service input working
+- Graph data storage operational
 
 ### Tasks
 
-#### Week 3: Graph Queries & Brand Intelligence
+#### Week 3: Brand Onboarding Flow
+
+```yaml
+Day 1-2: Graph Schema Implementation
+  □ Define Cypher schema in Neo4j Aura:
+    CREATE (b:Brand {
+      name: "Example",
+      website: "https://example.com",
+      tagline: "...",
+      industry: "..."
+    })
+    CREATE (l:Logo {
+      url: "...",
+      quality_score: 0.85,
+      source: "scraped|uploaded|ai_generated"
+    })
+    CREATE (c:Color {hex: "#FF5733", name: "Brand Orange"})
+    CREATE (p:Product {name: "...", price_range: "..."})
+    
+    CREATE (b)-[:HAS_LOGO]->(l)
+    CREATE (b)-[:USES_COLOR]->(c)
+    CREATE (b)-[:SELLS]->(p)
+  □ Test queries in Neo4j Browser
+  
+Day 3-4: Logo Enhancement Flow
+  □ Implement decision logic:
+    quality < 0.4 → Prompt for upgrade
+    quality 0.4-0.7 → Suggest upgrade
+    quality > 0.7 → Accept as-is
+  □ Create Hugging Face SDXL integration:
+    - Generate logo from description
+    - Use brand colors as input
+  □ Build logo selection UI endpoint:
+    POST /api/brands/{id}/logo/enhance
+    
+Day 5-7: Product/Service Input
+  □ Create text parsing endpoint:
+    POST /api/brands/{id}/products/parse-text
+    - Input: { "text": "We sell shoes ($50), shirts ($30)" }
+    - Output: [{ name: "shoes", price: "$50" }, ...]
+  □ Use Groq (Llama 3 70B) for parsing:
+    - Extract product names
+    - Extract price ranges
+    - Categorize products
+  □ Create product URL scraper:
+    POST /api/brands/{id}/products/scrape-url
+    - Scrape product page for items
+```
+
+#### Week 4: Graph Queries & AI Integration
 
 ```yaml
 Day 1-2: Cypher Query Development
-  □ Brand context query (colors, fonts, style)
-  □ Asset retrieval query
-  □ Preference query (likes/dislikes)
-  □ Similar content query (for inspiration)
+  □ Brand context query (all related data)
+  □ Product retrieval query
+  □ Color palette query
+  □ Full brand profile query
   
-Day 3-4: Brand Intelligence Agent
-  □ Create agent class structure
-  □ Implement context builder
-  □ Build prompt template generator
-  □ Add vector embedding for semantic search
-  
-Day 5-7: Generation Request Handler
-  □ POST /api/generate endpoint
-  □ Request validation and parsing
-  □ Queue management (Redis or in-memory)
-  □ Status tracking
-```
-
-#### Week 4: Image & Text Generation
-
-```yaml
-Day 1-3: Image Generation Agent
-  □ Replicate API integration
-  □ Prompt engineering for brand consistency:
-    - Include brand colors in prompt
-    - Specify style keywords
-    - Add negative prompts for prohibited elements
-  □ Image download and storage
-  □ Basic quality checks (resolution, format)
-  
-Day 4-5: Text Generation Agent
-  □ OpenAI API integration for headlines
-  □ Prompt template with brand voice
-  □ Character limit enforcement
-  □ Tone matching (professional, casual, etc.)
-  
-Day 6-7: Validation Agent
-  □ Color extraction from generated image (OpenCV/Pillow)
-  □ Color palette comparison with brand colors
-  □ Logo detection (if applicable)
-  □ Brand consistency scoring
+Day 3-4: AI API Integration
+  □ Hugging Face Inference API setup:
+    - SDXL for image generation (FREE tier)
+    - Test with brand prompts
+  □ Groq API setup:
+    - Llama 3 70B for text generation (FREE tier)
+    - Test prompt formatting
+    
+Day 5-7: Generation Endpoints
+  □ POST /api/generate/image
+    - Input: { brand_id, prompt, style }
+    - Output: { image_url, generation_id }
+  □ POST /api/generate/text
+    - Input: { brand_id, prompt, type: "headline|body" }
+    - Output: { text, generation_id }
 ```
 
 ### Deliverables
-✓ Working image generation  
-✓ Working text generation  
-✓ Brand consistency validation  
-✓ Basic scoring system
+✓ Complete brand onboarding flow
+✓ Product parsing working (text + URL)
+✓ Logo quality check with enhancement option
+✓ Graph storing all brand data
 
 ---
 
-## Week 5-6: Integration & Frontend
+## Week 5-6: Frontend & Generation
 
 ### Goals
-- Multi-agent orchestration
-- Web application
+- Web application working
+- End-to-end generation flow
 - User feedback collection
 
 ### Tasks
 
-#### Week 5: Orchestration & Workflows
-
-```yaml
-Day 1-2: Orchestrator Agent
-  □ Create async task manager (Python AsyncIO)
-  □ Implement agent coordination:
-    1. Brand Intelligence Agent
-    2. Image Generation Agent
-    3. Text Generation Agent
-    4. Validation Agent
-  □ Error handling and retries
-  
-Day 3-4: Feedback System
-  □ POST /api/feedback endpoint
-  □ Feedback storage in Neo4j
-  □ Graph update logic:
-    - Positive feedback → strengthen preferences
-    - Negative feedback → add prohibitions
-  □ Aggregation queries
-  
-Day 5-7: API Refinement
-  □ GET /api/generations - List past generations
-  □ GET /api/generations/{id} - Get specific generation
-  □ DELETE /api/generations/{id} - Delete generation
-  □ API documentation (FastAPI auto-docs)
-```
-
-#### Week 6: Frontend Development
+#### Week 5: Frontend Development
 
 ```yaml
 Day 1-2: React Setup
-  □ Create React app (Vite)
+  □ Create React app with Vite:
+    npm create vite@latest frontend -- --template react
   □ Set up React Router
-  □ Install UI library (Material-UI or Tailwind)
-  □ Configure API client (Axios)
+  □ Install Tailwind CSS (free, easy styling)
+  □ Configure API client (Axios or fetch)
+  □ Create component structure
   
-Day 3-4: Core Pages
-  □ Home page with brand selector
-  □ Generation request form:
-    - Campaign brief textarea
-    - Brand selection dropdown
-    - Content type selector
-  □ Loading state with agent activity display
-  
-Day 5-7: Results & History
-  □ Generation result display:
-    - Image preview
+Day 3-4: Brand Onboarding Pages
+  □ Step 1: Website URL Input
+    - URL input field
+    - "Analyze Website" button
+    - Loading states
+  □ Step 2: Review Scraped Data
+    - Show extracted: name, tagline, colors
+    - Show logo with quality score
+    - Enhancement options if poor quality
+  □ Step 3: Product Input
+    - Text area for manual input
+    - URL input for product pages
+    - Parsed products display
+    
+Day 5-7: Generation & Results Pages
+  □ Generation Request Form:
+    - Brand selector (dropdown)
+    - Prompt input (textarea)
+    - Content type (image/text/both)
+  □ Results Display:
+    - Generated image
     - Generated text
     - Brand consistency score
     - Feedback buttons (👍 👎)
-  □ Generation history page
-  □ Brand library page
+```
+
+#### Week 6: Integration & Feedback
+
+```yaml
+Day 1-2: End-to-End Flow
+  □ Connect frontend to all API endpoints
+  □ Test complete user journey:
+    1. Enter website URL
+    2. Review extracted data
+    3. Fix logo quality
+    4. Add products
+    5. Generate content
+    6. Give feedback
+  □ Handle loading states and errors
+  
+Day 3-4: Feedback System
+  □ POST /api/feedback endpoint
+  □ Store feedback in Neo4j:
+    (Generation)-[:RECEIVED_FEEDBACK]->(Feedback)
+  □ Update brand preferences based on feedback
+  □ Display feedback history
+  
+Day 5-7: UI Polish
+  □ Responsive design (works on mobile)
+  □ Better error messages
+  □ Loading animations
+  □ Success/failure notifications
 ```
 
 ### Deliverables
-✓ End-to-end generation flow  
-✓ Working web application  
-✓ Feedback collection system  
-✓ Generation history
+✓ Complete web application
+✓ Full brand onboarding flow
+✓ Generation and feedback working
+✓ Clean, usable UI
 
 ---
 
@@ -235,74 +295,82 @@ Day 5-7: Results & History
 
 ### Goals
 - Bug fixes and optimization
+- Deployment to free hosting
 - Demo preparation
-- Documentation finalization
 
 ### Tasks
 
-#### Week 7: Testing & Optimization
+#### Week 7: Testing & Deployment
 
 ```yaml
 Day 1-2: Testing
-  □ Unit tests for agents
-  □ Integration tests for API
-  □ End-to-end test scenarios
-  □ Load testing (10 concurrent users)
+  □ Manual end-to-end testing
+  □ Test edge cases:
+    - Invalid URLs
+    - Websites that block scraping
+    - Very slow image generation
+  □ Fix bugs found
   
-Day 3-4: Bug Fixes
-  □ Fix issues from testing
-  □ Error handling improvements
-  □ UI/UX refinements
-  □ Performance optimization
+Day 3-4: Deploy Backend to Railway FREE
+  □ Create Railway account (if not done)
+  □ Connect GitHub repository
+  □ Set environment variables:
+    - NEO4J_URI
+    - NEO4J_USER
+    - NEO4J_PASSWORD
+    - HUGGINGFACE_TOKEN
+    - GROQ_API_KEY
+  □ Deploy FastAPI backend
+  □ Test Railway URL works
   
-Day 5-7: Deployment
-  □ Set up DigitalOcean droplet
-  □ Create docker-compose.yml:
-    - FastAPI backend
-    - Neo4j database
-    - Redis cache
-    - React frontend (built)
-    - Nginx reverse proxy
-  □ Deploy to production
-  □ Set up domain and SSL
+Day 5-7: Deploy Frontend to Vercel FREE
+  □ Create Vercel account (if not done)
+  □ Connect GitHub repository
+  □ Set environment variable:
+    - VITE_API_URL (Railway backend URL)
+  □ Deploy React frontend
+  □ Test full application on Vercel URL
 ```
 
 #### Week 8: Demo Preparation
 
 ```yaml
 Day 1-2: Demo Content
-  □ Create 5 diverse demo brands:
-    - Nike (athletic, bold)
-    - Apple (minimalist, premium)
-    - Coca-Cola (playful, red)
-    - IBM (corporate, blue)
-    - Starbucks (earthy, green)
-  □ Prepare sample generation requests
-  □ Test complete demo flow
+  □ Create 3-5 demo brands by scraping real websites:
+    - Local coffee shop
+    - Gym/fitness
+    - Restaurant
+    - Clothing store
+    - Tech startup
+  □ Prepare demo scenarios:
+    - "Create a summer promotion"
+    - "Generate a social media post"
+    - "Design a sale announcement"
+  □ Test demo flow multiple times
   
 Day 3-4: Documentation
-  □ Update README.md
+  □ Update README.md with final instructions
   □ Create DEMO.md walkthrough
-  □ API documentation screenshots
-  □ Architecture diagram polish
-  □ Add code comments
+  □ Screenshot key screens
+  □ Document known limitations
   
 Day 5-7: Presentation
-  □ Create PowerPoint slides:
+  □ Create PowerPoint/Google Slides:
     - Problem statement
+    - Data intake flow (scraping → quality check → products)
     - System architecture
     - GraphRAG explanation
     - Live demo
     - Results and learnings
   □ Practice demo (dry run)
   □ Prepare Q&A answers
-  □ Record backup demo video
+  □ Record backup demo video (in case live demo fails)
 ```
 
 ### Deliverables
-✓ Deployed application  
-✓ Complete documentation  
-✓ Demo presentation  
+✓ Deployed on Railway + Vercel (FREE)
+✓ Complete documentation
+✓ Demo presentation
 ✓ Backup demo video
 
 ---
@@ -313,135 +381,178 @@ Day 5-7: Presentation
 system-design-capstone/
 ├── backend/
 │   ├── app/
-│   │   ├── agents/
-│   │   │   ├── brand_intelligence.py
-│   │   │   ├── image_generation.py
-│   │   │   ├── text_generation.py
-│   │   │   ├── validation.py
-│   │   │   └── orchestrator.py
+│   │   ├── scraping/
+│   │   │   ├── website_scraper.py    # Scrape company info
+│   │   │   ├── logo_extractor.py     # Extract logo from page
+│   │   │   ├── color_extractor.py    # Extract brand colors
+│   │   │   └── product_scraper.py    # Scrape product pages
+│   │   ├── quality/
+│   │   │   ├── image_quality.py      # Check image quality
+│   │   │   └── enhancement.py        # AI logo generation
+│   │   ├── generation/
+│   │   │   ├── image_generator.py    # Hugging Face SDXL
+│   │   │   └── text_generator.py     # Groq Llama 3
 │   │   ├── api/
-│   │   │   ├── brands.py
-│   │   │   ├── generations.py
-│   │   │   └── feedback.py
+│   │   │   ├── brands.py             # Brand CRUD + scraping
+│   │   │   ├── products.py           # Product input
+│   │   │   ├── generation.py         # Content generation
+│   │   │   └── feedback.py           # User feedback
 │   │   ├── core/
-│   │   │   ├── config.py
-│   │   │   ├── neo4j_client.py
-│   │   │   └── redis_client.py
-│   │   ├── models/
-│   │   │   └── schemas.py
-│   │   └── main.py
-│   ├── tests/
+│   │   │   ├── config.py             # Environment config
+│   │   │   └── neo4j_client.py       # Database connection
+│   │   └── main.py                   # FastAPI app
 │   ├── requirements.txt
-│   └── Dockerfile
+│   └── Procfile                      # For Railway deployment
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── BrandSelector.jsx
-│   │   │   ├── GenerationForm.jsx
-│   │   │   ├── ResultDisplay.jsx
-│   │   │   └── HistoryList.jsx
+│   │   │   ├── WebsiteInput.jsx      # Step 1: URL input
+│   │   │   ├── BrandReview.jsx       # Step 2: Review data
+│   │   │   ├── LogoQuality.jsx       # Logo quality check
+│   │   │   ├── ProductInput.jsx      # Step 3: Add products
+│   │   │   ├── GenerationForm.jsx    # Request generation
+│   │   │   └── ResultDisplay.jsx     # Show results
 │   │   ├── pages/
 │   │   │   ├── Home.jsx
+│   │   │   ├── Onboarding.jsx        # Brand onboarding flow
 │   │   │   ├── Generate.jsx
 │   │   │   └── History.jsx
 │   │   ├── services/
-│   │   │   └── api.js
+│   │   │   └── api.js                # API client
 │   │   └── App.jsx
 │   ├── package.json
-│   └── Dockerfile
+│   └── vercel.json                   # For Vercel deployment
 ├── database/
 │   ├── schema/
-│   │   └── init.cypher
-│   └── seed/
-│       └── demo_brands.cypher
-├── docker-compose.yml
+│   │   └── init.cypher               # Neo4j schema
+│   └── queries/
+│       └── brand_queries.cypher      # Common queries
 ├── .env.example
 ├── README.md
 └── docs/
     └── architecture/
         ├── 00-capstone-scope.md
-        ├── 01-system-overview.md
-        ├── 02-graphrag-design.md
-        ├── 03-image-generation-pipeline.md
-        ├── 04-agent-orchestration.md
-        ├── 05-monitoring-framework.md
-        ├── 06-implementation-roadmap.md
         └── 07-capstone-implementation.md (this file)
 ```
 
 ---
 
-## Technology Stack
+## Technology Stack (FREE Tier Focus)
 
 ```yaml
 Backend:
   - Python 3.11
-  - FastAPI
-  - Neo4j Python Driver
-  - OpenAI Python SDK
-  - Replicate Python Client
-  - Redis
-  - Pydantic
-  - Pytest
+  - FastAPI (web framework)
+  - neo4j (Python driver)
+  - requests + beautifulsoup4 (web scraping)
+  - pillow (image processing)
+  - colorthief (color extraction)
+  - httpx (async HTTP client for APIs)
 
 Frontend:
   - React 18
-  - Vite
+  - Vite (build tool)
   - React Router
-  - Axios
-  - Material-UI or Tailwind CSS
+  - Tailwind CSS (styling)
+  - Axios (API client)
 
 Database:
-  - Neo4j Community Edition 5.x
-  - Redis 7.x
+  - Neo4j Aura FREE (cloud graph database)
 
-APIs:
-  - OpenAI (GPT-4o-mini)
-  - Replicate (SDXL)
+AI APIs (ALL FREE TIER):
+  - Hugging Face Inference API (SDXL image generation)
+  - Groq (Llama 3 70B for text)
 
-Deployment:
-  - Docker & Docker Compose
-  - DigitalOcean
-  - Nginx
-  - Cloudflare (DNS + CDN)
+Hosting (ALL FREE):
+  - Railway FREE (backend - 500 hours/month)
+  - Vercel FREE (frontend - unlimited)
+  - Cloudflare R2 FREE (image storage - 10GB)
+```
+
+---
+
+## Cost Estimate
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    MONTHLY COST BREAKDOWN                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Service              Plan          Cost      Notes                         │
+│  ───────────────────────────────────────────────────────────────────────   │
+│  Neo4j Aura           FREE          $0        50K nodes (plenty!)           │
+│  Railway              FREE          $0        500 hours/month               │
+│  Vercel               Hobby         $0        Unlimited for hobby           │
+│  Cloudflare R2        FREE          $0        10GB storage                  │
+│  Hugging Face         FREE          $0        Rate limited but enough       │
+│  Groq                 FREE          $0        6000 req/day (plenty!)        │
+│  ───────────────────────────────────────────────────────────────────────   │
+│  TOTAL                              $0        For development/demo          │
+│                                                                              │
+│  Optional upgrades if needed:                                                │
+│  • Railway Pro: $5/month (more hours)                                       │
+│  • Replicate: Pay-per-use ($0.0055/image) - backup for Hugging Face        │
+│                                                                              │
+│  WORST CASE:                        $5-15/month                             │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Minimal Viable Demo
 
-For the capstone presentation, focus on this user flow:
+For the capstone presentation, demonstrate this user flow:
 
 ```
-1. Professor opens web app
+1. Professor opens web app (Vercel URL)
    ↓
-2. Selects "Nike" brand
+2. Enters a local business website:
+   "https://www.localcoffeeshop.com"
    ↓
-3. Enters campaign brief:
-   "Create a social media ad for running shoes,
-    targeting young athletes, summer vibes"
+3. System shows real-time scraping:
+   [✓] Fetching webpage...
+   [✓] Extracting company info...
+   [→] Finding logo...
+   [ ] Analyzing colors...
    ↓
-4. Clicks "Generate"
+4. Review extracted data:
+   - Company: "Local Coffee Co."
+   - Tagline: "Freshly roasted daily"
+   - Logo: [IMAGE] ⚠️ Quality: 0.48
+   - Colors: #4A2C2A, #F5E6D3
    ↓
-5. System shows real-time progress:
-   [✓] Analyzing brand context...
-   [✓] Generating reasoning...
-   [→] Creating image...
-   [ ] Writing copy...
-   [ ] Validating brand consistency...
+5. System prompts about logo quality:
+   "Your logo appears slightly blurry. Would you like to:
+    [A] Generate AI version
+    [B] Upload better image  
+    [C] Keep as is"
    ↓
-6. Results displayed (~30-45 seconds):
-   - Generated image (athletic shoe, Nike colors)
-   - Headline: "Run Your Summer"
-   - Body: "Feel the freedom..."
-   - Brand Score: 0.92/1.0 ✓
+6. User adds products:
+   "We sell specialty coffee ($15-25),
+    cold brew ($5), and merchandise"
+   → System parses: Coffee Beans, Cold Brew, Merchandise
    ↓
-7. Professor gives feedback (👍)
+7. User requests content:
+   "Create a summer promotion for iced drinks"
    ↓
-8. System updates graph (show Neo4j Browser)
-```
+8. System generates (30-60 seconds):
+   [✓] Loading brand context from graph...
+   [✓] Building generation prompt...
+   [→] Generating image (Hugging Face SDXL)...
+   [ ] Writing marketing copy (Groq Llama 3)...
+   ↓
+9. Results displayed:
+   - Generated image (iced coffee, brand colors)
+   - Headline: "Cool Down This Summer"
+   - Body copy: "Beat the heat with our..."
+   - Brand consistency: ✓
+   ↓
+10. Professor gives feedback (👍)
+    → Show Neo4j Browser with updated graph
 
-**Total demo time: 3-5 minutes**
+**Total demo time: 5-7 minutes**
+```
 
 ---
 
@@ -449,11 +560,13 @@ For the capstone presentation, focus on this user flow:
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| API costs exceed budget | HIGH | Monitor usage daily, implement rate limiting, cache responses |
-| Replicate API slow/down | MEDIUM | Have backup generated images, demo video |
-| Neo4j complexity | MEDIUM | Start with simple queries, use Neo4j Browser for visualization |
-| Time overrun | HIGH | Cut scope: focus on single brand demo if needed |
-| Team member unavailable | MEDIUM | Clear task ownership, good documentation |
+| Website blocks scraping | MEDIUM | Have manual input fallback, use headers |
+| Hugging Face rate limited | LOW | Groq as backup, cache results |
+| Groq API slow | LOW | Use Hugging Face text models as backup |
+| Neo4j Aura cold start | LOW | Keep warm with periodic pings |
+| Railway sleeps after inactivity | MEDIUM | Wake up before demo, use cron ping |
+| Time overrun | HIGH | Cut scope: focus on scraping demo only |
+| Free tier limits exceeded | LOW | Monitor usage, use backup services |
 
 ---
 
@@ -495,17 +608,23 @@ If you want to extend this project:
 
 ## Resources
 
+### Free Services to Sign Up
+| Service | URL | What You Get |
+|---------|-----|--------------|
+| Neo4j Aura | aura.neo4j.io | Free graph database |
+| Hugging Face | huggingface.co | Free AI image generation |
+| Groq | groq.com | Free Llama 3 70B access |
+| Vercel | vercel.com | Free frontend hosting |
+| Railway | railway.app | Free backend hosting |
+| Cloudflare R2 | cloudflare.com | Free image storage |
+
 ### Learning Materials
 - Neo4j GraphAcademy: https://graphacademy.neo4j.com/
 - FastAPI Tutorial: https://fastapi.tiangolo.com/tutorial/
 - React Docs: https://react.dev/
-- Replicate Docs: https://replicate.com/docs
-- OpenAI Cookbook: https://cookbook.openai.com/
-
-### Community Support
-- Neo4j Discord: https://neo4j.com/developer/discord/
-- FastAPI Discord: https://discord.com/invite/fastapi
-- r/GraphDatabase: https://reddit.com/r/GraphDatabase
+- Web Scraping with BeautifulSoup: https://realpython.com/beautiful-soup-web-scraper-python/
+- Hugging Face Inference API: https://huggingface.co/docs/api-inference/
+- Groq Documentation: https://console.groq.com/docs
 
 ---
 
@@ -513,11 +632,17 @@ If you want to extend this project:
 
 | Week | Checkpoint | Demo-able? |
 |------|-----------|------------|
-| 2 | Backend + Database working | ❌ No UI yet |
-| 4 | Generation working via API | ⚠️ API only (Postman demo) |
-| 6 | Full web app functional | ✅ Yes! Core demo ready |
+| 2 | Backend + Scraping working | ⚠️ API only (Postman demo) |
+| 4 | Full data intake pipeline | ⚠️ Can show graph in Neo4j Browser |
+| 6 | Web app functional | ✅ Yes! Core demo ready |
 | 8 | Polished + deployed | ✅ Yes! Full presentation ready |
 
 ---
 
-**Remember**: The goal is to demonstrate understanding of GraphRAG, multi-agent systems, and full-stack development—not to build a production system. Focus on making the core concepts clear and demo-able!
+**Remember**: The goal is to demonstrate understanding of:
+- **Web scraping** (data extraction)
+- **Image processing** (quality assessment)
+- **GraphRAG** (knowledge graph + AI)
+- **Full-stack development** (React + FastAPI + Neo4j)
+
+Focus on making the data intake pipeline clear and the core generation working. You don't need production-grade infrastructure—this is a learning project!
