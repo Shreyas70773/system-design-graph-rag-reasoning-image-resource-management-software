@@ -1,0 +1,279 @@
+================================================================================
+                        BASE PAPERS SUMMARY
+              Brand-Aligned Content Generation Platform
+================================================================================
+
+
+================================================================================
+                              BASE PAPER 1
+================================================================================
+
+PAPER NAME:
+    Graph Retrieval-Augmented Generation: A Survey
+
+AUTHORS:
+    Boci Peng¹, Yun Zhu², Yongchao Liu³, Xiaohe Bo⁴, Haizhou Shi⁵, 
+    Chuntao Hong³, Yan Zhang¹*, Siliang Tang²
+    
+    ¹ School of Intelligence Science and Technology, Peking University, China
+    ² College of Computer Science and Technology, Zhejiang University, China
+    ³ Ant Group, China
+    ⁴ Gaoling School of Artificial Intelligence, Renmin University of China
+    ⁵ Rutgers University, US
+    
+    * Corresponding Author
+    Published: September 2024 | arXiv:2408.08921
+
+ABSTRACT:
+    Recently, Retrieval-Augmented Generation (RAG) has achieved remarkable 
+    success in addressing the challenges of Large Language Models (LLMs) 
+    without necessitating retraining. By referencing an external knowledge 
+    base, RAG refines LLM outputs, effectively mitigating issues such as 
+    "hallucination", lack of domain-specific knowledge, and outdated 
+    information. However, the complex structure of relationships among 
+    different entities in databases presents challenges for RAG systems. 
+    In response, GraphRAG leverages structural information across entities 
+    to enable more precise and comprehensive retrieval, capturing relational 
+    knowledge and facilitating more accurate, context-aware responses. Given 
+    the novelty and potential of GraphRAG, a systematic review of current 
+    technologies is imperative. This paper provides the first comprehensive 
+    overview of GraphRAG methodologies. We formalize the GraphRAG workflow, 
+    encompassing Graph-Based Indexing, Graph-Guided Retrieval, and 
+    Graph-Enhanced Generation.
+
+METHODOLOGY:
+    The paper formalizes GraphRAG into three stages:
+    
+    1. G-INDEXING (Graph-Based Indexing):
+       - Construct/identify graph database aligned with downstream tasks
+       - Graph data sources: Open Knowledge Graphs (Wikidata, Freebase, 
+         DBpedia, YAGO, ConceptNet) or Self-Constructed Graphs
+       - Indexing methods: Graph Indexing, Text Indexing, Vector Indexing, 
+         Hybrid Indexing
+       
+    2. G-RETRIEVAL (Graph-Guided Retrieval):
+       - Extract pertinent information from graph database given user query
+       - Retrieval granularities: Nodes, Triplets, Paths, Subgraphs, Hybrid
+       - Retrievers: Non-parametric, LM-based, GNN-based
+       - Retrieval paradigms: Once, Iterative (adaptive/non-adaptive), 
+         Multi-stage
+       - Enhancement techniques: Query expansion, Query decomposition, 
+         Knowledge merging, Knowledge pruning
+       
+    3. G-GENERATION (Graph-Enhanced Generation):
+       - Synthesize meaningful outputs based on retrieved graph data
+       - Generators: GNNs, Language Models, Hybrid Models
+       - Graph formats for LMs: Adjacency tables, Natural language, 
+         Code-like forms, Syntax trees, Node sequences, Graph embeddings
+       - Enhancement: Pre-generation, Mid-generation, Post-generation
+    
+    Mathematical Formulation:
+       y* = argmax P(y|q, G)
+       
+       Where y* is optimal answer given query q and graph G
+       
+       Decomposed as:
+       P(y|q, G) ≈ P_θ(y|q, G*) × P_φ(G*|q, G)
+       
+       Where G* is optimal subgraph, θ = generator params, φ = retriever params
+
+FINDINGS:
+    1. LIMITATIONS OF TRADITIONAL RAG:
+       - Neglecting Relationships: Traditional RAG fails to capture 
+         structured relational knowledge beyond semantic similarity
+       - Redundant Information: Text concatenation leads to "lost in the 
+         middle" problem with excessively long contexts
+       - Lacking Global Information: RAG retrieves only document subsets, 
+         missing comprehensive global context
+    
+    2. GRAPHRAG ADVANTAGES:
+       - Captures relational knowledge through graph elements (nodes, 
+         triplets, paths, subgraphs)
+       - Knowledge graphs offer abstraction/summarization, shortening 
+         input length
+       - Graph communities enable comprehensive information access for 
+         Query-Focused Summarization
+    
+    3. KEY FINDINGS ON RETRIEVERS:
+       - Non-parametric retrievers: High efficiency but may suffer from 
+         inaccurate retrieval without task-specific training
+       - LM-based retrievers: Higher accuracy but significant computational 
+         overhead
+       - GNN-based retrievers: Adept at leveraging complex graph structures
+       - Hybrid approaches recommended for balancing efficiency and accuracy
+    
+    4. RETRIEVAL GRANULARITY INSIGHTS:
+       - Nodes: Precise but limited contextual breadth
+       - Triplets: Structured but may lack indirect relationships
+       - Paths: Captures reasoning chains but exponential complexity
+       - Subgraphs: Comprehensive but computationally expensive
+       - Hybrid granularities often best for complex scenarios
+    
+    5. FUTURE RESEARCH DIRECTIONS:
+       - Dynamic and Adaptive Graphs (real-time updates)
+       - Multi-Modality Information Integration (images, audio, video)
+       - Scalable and Efficient Retrieval for billion-entity graphs
+       - Integration with Graph Foundation Models
+       - Lossless Compression of Retrieved Context
+       - Standard Benchmarks for evaluation
+       - Broader Applications (healthcare, finance, legal, smart cities)
+
+
+================================================================================
+                              BASE PAPER 2
+================================================================================
+
+PAPER NAME:
+    From Local to Global: A Graph RAG Approach to Query-Focused Summarization
+
+AUTHORS:
+    Darren Edge, Ha Trinh, Newman Cheng, Joshua Bradley, Alex Chao, 
+    Apurva Mody, Steven Truitt, Jonathan Larson
+    
+    Microsoft Research
+    Published: April 2024 | arXiv:2404.16130
+
+ABSTRACT:
+    The use of retrieval-augmented generation (RAG) to retrieve relevant 
+    information from an external knowledge source enables large language 
+    models (LLMs) to answer questions over private and/or previously unseen 
+    document collections. However, RAG fails on global questions directed 
+    at an entire text corpus, such as "What are the main themes in the 
+    dataset?", since this is inherently a query-focused summarization (QFS) 
+    task, rather than an explicit retrieval task. Prior methods addressing 
+    QFS do not scale to the volumes of text indexed by typical RAG systems. 
+    In response, we propose a Graph RAG approach to question answering over 
+    private text corpora that scales with both the generality of user 
+    questions and the quantity of source text to be indexed. Our approach 
+    uses an LLM to build a graph-based text index in two stages: first to 
+    derive an entity knowledge graph from the source documents, then to 
+    pre-generate community summaries for all groups of closely-related 
+    entities. Given a question, each community summary is used to generate 
+    a partial response, from which a final response is generated in the end.
+
+METHODOLOGY:
+    TWO-STAGE INDEXING PROCESS:
+    
+    Stage 1 - Entity Knowledge Graph Construction:
+       a) Source Document Chunking: Split documents into manageable chunks
+       b) Entity & Relationship Extraction: Use LLM to extract entities 
+          and relationships from each chunk
+       c) Entity Resolution: Merge duplicate entities across chunks
+       d) Graph Construction: Build knowledge graph from extracted 
+          entities and relationships
+    
+    Stage 2 - Community Detection & Summarization:
+       a) Apply Leiden algorithm for hierarchical community detection
+       b) Detect communities at multiple resolution levels
+       c) For each community: Generate LLM-based summary describing 
+          the entities and their relationships
+       d) Store summaries at multiple hierarchy levels
+    
+    QUERY-TIME PROCESSING:
+       1. Given user query, retrieve relevant community summaries
+       2. Each summary generates a "partial response" to the query
+       3. LLM aggregates partial responses into final answer
+       4. For global queries: use higher-level (coarser) summaries
+       5. For local queries: use lower-level (finer) summaries
+    
+    MAP-REDUCE SUMMARIZATION:
+       - Map Phase: Generate partial answers from each community summary
+       - Reduce Phase: Aggregate partial answers into final response
+       - Enables parallelization and handles large-scale corpora
+    
+    HIERARCHICAL COMMUNITY STRUCTURE:
+       Level 0: Individual entities (finest granularity)
+       Level 1: Small communities of closely related entities
+       Level 2: Larger communities combining Level 1 groups
+       Level N: Global/corpus-level themes (coarsest granularity)
+
+FINDINGS:
+    1. OUTPERFORMS NAIVE RAG ON GLOBAL QUERIES:
+       - Traditional RAG retrieves specific passages but cannot synthesize 
+         corpus-wide themes
+       - Graph RAG's community summaries capture global patterns
+       - Significant improvement on Query-Focused Summarization tasks
+    
+    2. COMPREHENSIVENESS VS. DIVERSITY TRADE-OFF:
+       - Higher-level summaries: More comprehensive but less detailed
+       - Lower-level summaries: More specific but may miss connections
+       - Users can select appropriate level based on query type
+    
+    3. SCALABILITY FINDINGS:
+       - Pre-computed community summaries enable efficient query-time 
+         processing
+       - Map-reduce approach handles large document collections
+       - Trade-off: Higher indexing cost, lower query-time cost
+    
+    4. ENTITY RESOLUTION IMPORTANCE:
+       - Proper entity resolution critical for graph quality
+       - Duplicate entities fragment knowledge across communities
+       - LLM-based entity resolution improves graph coherence
+    
+    5. COMMUNITY SIZE IMPACT:
+       - Too small: Fragmented context, missing relationships
+       - Too large: Diluted focus, irrelevant information
+       - Leiden algorithm with resolution parameter balances this
+    
+    6. LLM SUMMARY QUALITY:
+       - Quality of community summaries directly impacts final answers
+       - Prompt engineering for summarization is crucial
+       - Summaries should capture both entities AND relationships
+
+
+================================================================================
+                    COMPARISON OF BASE PAPERS
+================================================================================
+
+┌─────────────────────┬──────────────────────────┬──────────────────────────┐
+│ ASPECT              │ PAPER 1 (Peng et al.)    │ PAPER 2 (Edge et al.)    │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Type                │ Survey/Review Paper      │ Original Research Paper  │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Scope               │ Comprehensive overview   │ Specific method for QFS  │
+│                     │ of all GraphRAG methods  │ (Query-Focused Summary)  │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Key Innovation      │ Formalizes 3-stage       │ Community detection +    │
+│                     │ pipeline (G-Index,       │ hierarchical summaries   │
+│                     │ G-Retrieve, G-Generate)  │ for local-to-global      │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Graph Source        │ Open KGs or self-built   │ Self-constructed from    │
+│                     │ from various sources     │ source documents         │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Query Type          │ Both local and global    │ Specifically addresses   │
+│                     │ queries covered          │ global/thematic queries  │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Main Problem Solved │ Relationships neglected, │ RAG fails on global      │
+│                     │ redundant info, no       │ questions requiring      │
+│                     │ global context           │ corpus-wide synthesis    │
+├─────────────────────┼──────────────────────────┼──────────────────────────┤
+│ Our Project Uses    │ G-Index, G-Retrieve,     │ Hierarchical structure   │
+│                     │ G-Generate framework     │ for brand identity       │
+│                     │ for brand DNA pipeline   │ (global/local queries)   │
+└─────────────────────┴──────────────────────────┴──────────────────────────┘
+
+
+================================================================================
+                    HOW OUR PROJECT APPLIES THESE PAPERS
+================================================================================
+
+FROM PAPER 1 (GraphRAG Survey):
+  ✓ G-Indexing: We build brand-specific knowledge graph in Neo4j
+  ✓ G-Retrieval: Single Cypher query retrieves relevant brand DNA
+  ✓ G-Generation: LLM uses graph data to generate brand-aligned content
+  ✓ Relationship Properties: We use weighted relationships (role, confidence)
+  ✓ Hybrid Approach: Combine graph structure with LLM reasoning
+
+FROM PAPER 2 (Microsoft GraphRAG):
+  ✓ Hierarchical Structure: Brand identity has global (aesthetic) and 
+    local (hex codes, logo rules) levels
+  ✓ Entity Resolution: Products, colors, styles are resolved entities
+  ✓ Pre-computed Knowledge: Brand DNA is pre-indexed, not computed at 
+    query time
+  ✓ Local + Global Queries: "What's the brand color?" (local) vs 
+    "What defines this brand?" (global)
+
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================

@@ -281,7 +281,7 @@ Docker would only be needed for production deployment, which is overkill for a c
 ```
 
 ### Phase 9: Integration Testing (Week 5-6)
-```
+```x`
 □ Test complete flow:
   □ Enter website URL
   □ Review scraped data

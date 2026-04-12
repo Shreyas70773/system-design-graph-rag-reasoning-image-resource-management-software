@@ -1,0 +1,30 @@
+# Brand-Aligned Content Generation Platform
+# Backend Dependencies
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Configuration
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+
+# Database
+neo4j==5.17.0
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Web Scraping
+beautifulsoup4==4.12.3
+lxml==5.1.0
+
+# Image Processing
+Pillow==10.2.0
+colorthief==0.2.1
+numpy==1.26.3
+
+# For development
+python-multipart==0.0.6  # For file uploads

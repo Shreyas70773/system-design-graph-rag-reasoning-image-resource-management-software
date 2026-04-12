@@ -1,0 +1,192 @@
+Writing Instructions for Literature Review
+Target Profile
+
+Authors: Undergraduate/graduate students in Computer Science
+Audience: Academic reviewers, capstone committee
+Tone: Professional but accessible, demonstrating understanding without overclaiming
+Length: 6-8 pages (standard conference paper format)
+
+Critical Writing Guidelines
+PROMPT FOR LITERATURE REVIEW GENERATION:
+
+You are writing a literature review section for a college capstone project on 
+"Brand-Aware Content Generation Using GraphRAG and Web Scraping."
+
+STRICT REQUIREMENTS:
+
+1. TONE & VOICE:
+   - Write as a senior undergraduate or early graduate student would
+   - Show enthusiasm for the topic but acknowledge limitations
+   - Use phrases like:
+     * "Our investigation reveals..."
+     * "We observe that..."
+     * "Building on prior work..."
+     * "This approach addresses..."
+   - AVOID:
+     * "Groundbreaking" / "Revolutionary" / "Novel" (overused AI words)
+     * "Delve into" / "Dive deep" / "Harness" (AI clichés)
+     * "It is worth noting that" / "Moreover" / "Furthermore" (repetitive transitions)
+     * Excessive use of "significant" / "crucial" / "essential"
+
+2. STRUCTURE:
+   Follow this organization:
+   
+   Section 2: Related Work
+   2.1 Knowledge Graph Construction (AutoSchemaKG, GraphRAG Survey)
+   2.2 Web Scraping and Brand Data Extraction (Logo detection, Color extraction)
+   2.3 Image Quality Assessment (BRISQUE, Deep learning IQA)
+   2.4 Retrieval-Augmented Generation (RAG optimization, Hybrid approaches)
+   2.5 Brand Consistency in Generated Content (Brand voice, Style transfer)
+   2.6 User Feedback and Preference Learning (DPO, Efficient RLHF)
+
+3. WRITING STYLE:
+   - Vary sentence structure (mix short and long sentences)
+   - Use active voice when discussing methods: "We implement..." not "It was implemented..."
+   - Include specific metrics when available: "achieved 77.6% MRR improvement"
+   - Acknowledge gaps: "While X addresses Y, it does not handle Z, which our system tackles..."
+   - Connect to your project: "This finding informs our design decision to..."
+
+4. AVOID AI DETECTION:
+   - NO lists within paragraphs (convert to narrative flow)
+   - Vary vocabulary (use synonyms, don't repeat "approach" 15 times)
+   - Include occasional contractions where appropriate: "doesn't", "we'll"
+   - Use domain-specific jargon naturally: "Cypher queries", "Laplacian variance", "SDXL"
+   - Add subtle imperfections: "roughly 85%", "approximately", "around"
+   
+5. ACADEMIC INTEGRITY:
+   - Cite every claim with [AuthorYear] format
+   - Paraphrase, don't quote extensively
+   - Compare and contrast approaches
+   - Identify gaps that justify your project
+
+6. SPECIFIC VOCABULARY TO AVOID (AI red flags):
+   ? "Delve"
+   ? "Intricate"
+   ? "Robust" (use "reliable", "stable", "effective" instead)
+   ? "Myriad"
+   ? "Nuanced"
+   ? "Comprehensive" (once is fine, not 5 times)
+   ? "Leverage" (use "use", "apply", "employ")
+   ? Starting sentences with "Interestingly,"
+   ? "In today's digital landscape"
+
+7. BETTER ALTERNATIVES:
+   Instead of: "This approach leverages cutting-edge techniques..."
+   Write: "This method applies recent advances in..."
+   
+   Instead of: "The system demonstrates robust performance..."
+   Write: "The system performs reliably across..."
+   
+   Instead of: "We delve into the intricacies of..."
+   Write: "We examine the technical details of..."
+
+8. CONNECTING TO YOUR PROJECT:
+   For each paper, explain in 1-2 sentences:
+   - What problem it solves
+   - How it relates to your capstone
+   - What limitation you're addressing or extending
+   
+   Example:
+   "While AutoSchemaKG [Chen2025] automates knowledge graph construction,
+   it focuses on general-purpose extraction. Our system extends this by
+   specializing in brand-specific entities (logos, colors, products) and
+   incorporates quality assessment, which AutoSchemaKG does not address."
+
+9. PARAGRAPH STRUCTURE:
+   Each paragraph should:
+   - Start with a topic sentence (what this group of papers addresses)
+   - Discuss 2-3 related papers
+   - Compare their approaches
+   - Identify gaps or limitations
+   - Connect to your project (how you build on or differ from them)
+
+10. LATEX FORMATTING:
+    - Use \cite{authorYear} for citations
+    - Use \section{}, \subsection{} for structure
+    - Include a \begin{table} comparing key approaches (optional but helpful)
+    - Use \textit{} for technical terms on first use
+    - Use \textbf{} sparingly for emphasis
+
+11. LENGTH GUIDANCE:
+    - 2.1 Knowledge Graph Construction: 1.5 pages
+    - 2.2 Web Scraping: 1 page
+    - 2.3 Image Quality: 0.75 pages
+    - 2.4 RAG Systems: 1.5 pages
+    - 2.5 Brand Consistency: 1 page
+    - 2.6 Feedback Learning: 0.75 pages
+    Total: ~6.5 pages
+
+12. CRITICAL: STUDENT PERSPECTIVE
+    Acknowledge your position:
+    - "Given our constraints (< $15/month budget)..."
+    - "For our capstone scope (5-10 users)..."
+    - "We prioritize X over Y due to implementation timeline..."
+    - "Future work could explore..."
+
+OUTPUT FORMAT:
+- Provide complete LaTeX code
+- Include \documentclass{article} header with necessary packages
+- Include bibliography section with all cited papers
+- Use academic two-column format if possible
+- Include a comparison table (optional)
+
+BEGIN WITH:
+\section{Related Work}
+
+In this section, we review recent advances in knowledge graph construction,
+web scraping, image quality assessment, retrieval-augmented generation,
+brand consistency enforcement, and preference learning. Our review focuses
+on work from 2023-2026, emphasizing production-ready approaches suitable
+for resource-constrained environments.
+
+[Continue from here...]
+
+Additional Writing Tips
+Natural Transitions (Not AI-Generated)
+Instead of repetitive "Moreover", "Furthermore", "Additionally":
+
+"Building on this..."
+"A related approach..."
+"Similarly,"
+"In contrast,"
+"This finding suggests..."
+"Recent work has shown..."
+"Extending this idea..."
+
+Show Understanding, Not Just Summarizing
+? Bad: "The paper proposes a method for X."
+? Good: "Chen et al. address X by combining Y and Z, achieving W% improvement over baseline B."
+Acknowledge Limitations Honestly
+? Bad: "This approach is not perfect."
+? Good: "While effective for general websites, this method struggles with JavaScript-heavy sites, a challenge we address using Selenium."
+Connect Papers to Each Other
+? Bad: Review each paper in isolation
+? Good: "Unlike GraphRAG [Peng2024], which requires manual schema design, AutoSchemaKG [Chen2025] automates this process, though at the cost of reduced control over entity types."
+
+Sample Opening Paragraph (Reference)
+latex\section{Related Work}
+
+Our system integrates several research areas: automated knowledge graph 
+construction from web data, image quality assessment, and retrieval-augmented
+generation for brand-consistent content. Recent advances in each area have
+made our approach feasible within the constraints of a capstone project.
+In this section, we examine how prior work addresses these challenges and
+identify gaps our system fills.
+
+Final Checklist Before Submission
+
+ No sentence starts with "Delve" or "Leverage"
+ "Robust" used ? 2 times total
+ Varied transitions (not 10x "Furthermore")
+ Every claim cited
+ Compared papers to each other, not just listed
+ Connected each area to your specific project
+ Acknowledged limitations honestly
+ Used active voice for your contributions
+ Included 1-2 comparison tables
+ Length: 6-8 pages
+ LaTeX compiles without errors
+ Bibliography formatted consistently
+
+
+Key Principle: Write as if explaining to a technically competent professor who will ask "Why did you choose this approach?" Your literature review should preemptively answer that by showing you understand the field and made informed decisions.

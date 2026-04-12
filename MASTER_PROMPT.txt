@@ -1,0 +1,168 @@
+MASTER PROJECT PROMPT
+
+Brand-Aligned Content Generation Platform - Capstone Implementation
+
+You are building a **college capstone project** that demonstrates a graph-augmented content generation system. The system scrapes company websites, extracts brand data, and uses AI to generate brand-consistent marketing content.
+
+PROJECT OVERVIEW
+=================
+Create a web application where clients can:
+1. Enter their website URL → System scrapes company info and logo
+2. Review extracted data → If logo quality is poor, offer AI enhancement
+3. Add products/services → Via text description or product page URL  
+4. Generate marketing content → AI creates images and copy that match their brand
+
+TECHNICAL REQUIREMENTS
+======================
+- Budget: < $15/month (use FREE tier services only)
+- No Docker required (local development + cloud hosting)
+- Timeline: 8 weeks, 11 implementation phases
+- Scale: 5-10 users for academic demonstration
+
+CORE ARCHITECTURE
+=================
+Frontend (React + Tailwind) → Vercel FREE
+    ↓ API calls
+Backend (Python FastAPI) → Railway FREE  
+    ↓ queries
+Neo4j Aura FREE (Graph DB)
+    ↓ AI calls
+Hugging Face FREE (SDXL images) + Groq FREE (Llama 3 text)
+    ↓ storage
+Cloudflare R2 FREE (images)
+
+DATA FLOW IMPLEMENTATION
+========================
+1. Web Scraper: BeautifulSoup extracts company name, tagline, logo, colors
+2. Quality Checker: Pillow checks logo resolution/blur → score 0.0-1.0
+3. Enhancement Options: If score < 0.7 → offer AI generation, upload, or keep
+4. Product Parser: Groq Llama 3 extracts entities from text OR scrape product pages
+5. Graph Storage: Neo4j stores Brand→Logo→Colors→Products relationships  
+6. Content Generation: Build prompts with brand context → Hugging Face + Groq APIs
+7. Brand Validation: Extract colors from generated images, compare to brand palette
+
+TECHNOLOGY STACK
+================
+Component       Tool                    Why
+---------       ----                    ---
+Backend         Python + FastAPI        Async support, auto-docs, type hints
+Frontend        React + Vite + Tailwind Modern, fast, component-based
+Database        Neo4j Aura FREE         Graph relationships, 50K nodes
+Image AI        Hugging Face SDXL       Free inference API
+Text AI         Groq Llama 3 70B        Free tier, 6000 req/day
+Scraping        BeautifulSoup + Pillow  HTML parsing, image processing
+Colors          ColorThief              Dominant color extraction
+Hosting         Railway + Vercel        Free tiers, auto-deploy
+
+FREE SERVICES SETUP REQUIRED
+=============================
+Accounts to create:
+- Neo4j Aura (aura.neo4j.io) - Graph database
+- Hugging Face (huggingface.co) - Image generation API  
+- Groq (groq.com) - Text generation API
+- Railway (railway.app) - Backend hosting
+- Vercel (vercel.com) - Frontend hosting
+- Cloudflare (cloudflare.com) - Image storage (optional)
+
+IMPLEMENTATION PHASES (8 weeks)
+===============================
+1. Phase 0-1: Setup + create accounts (Days 1-3)
+2. Phase 2: FastAPI backend foundation (Week 1) 
+3. Phase 3: Web scraping module (BeautifulSoup) (Week 1-2)
+4. Phase 4: Image quality checker (Pillow) (Week 2)
+5. Phase 5: Neo4j graph schema + queries (Week 2-3)
+6. Phase 6: Product input parsing (Groq LLM) (Week 3)
+7. Phase 7: Content generation (HF + Groq APIs) (Week 3-4)
+8. Phase 8: React frontend (Week 4-5)
+9. Phase 9: Integration testing (Week 5-6)
+10. Phase 10: Deploy to Railway + Vercel (Week 6-7)
+11. Phase 11: Demo preparation (Week 7-8)
+
+KEY ALGORITHMS TO IMPLEMENT
+============================
+
+# 1. Blur Detection (Laplacian Variance)
+def detect_blur(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
+    variance = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return variance  # < 100 = blurry
+
+# 2. Color Extraction  
+def extract_colors(image_path):
+    ct = ColorThief(image_path)
+    return ct.get_palette(color_count=5)
+
+# 3. Product Parsing with LLM
+def parse_products(text):
+    prompt = f"Extract products from: {text}\nReturn JSON: [{{name, price, category}}]"
+    # Send to Groq Llama 3
+
+# 4. Brand Context Query (Cypher)
+MATCH (b:Brand {id: $id})-[r]->(related) 
+RETURN b, collect(related) as context
+
+CORE API ENDPOINTS TO BUILD
+============================
+POST /api/brands/scrape - Scrape website for brand data
+POST /api/brands/{id}/logo/check-quality - Assess logo quality
+POST /api/brands/{id}/logo/generate-ai - Generate AI logo
+POST /api/brands/{id}/products/parse-text - Parse products from text
+POST /api/generate - Generate marketing content
+
+DEMO FLOW (5-7 minutes)
+========================
+1. Enter "https://www.localcoffeeshop.com"
+2. Show scraped data: name, colors, logo quality score 0.48
+3. Offer logo enhancement options
+4. Add products: "We sell coffee ($15), cold brew ($5)"  
+5. Generate content: "Create summer iced coffee promotion"
+6. Display: generated image + headline + body + brand score
+7. Open Neo4j Browser to show graph relationships
+
+LEARNING OBJECTIVES
+===================
+- Web Scraping: Extract structured data from HTML
+- Image Processing: Quality assessment algorithms  
+- Graph Databases: Neo4j, Cypher queries, relationship modeling
+- AI Integration: Prompt engineering, API calls, error handling
+- Full-Stack Development: React frontend + FastAPI backend
+
+SUCCESS CRITERIA
+================
+- Complete data intake pipeline working (URL → scrape → quality → products → graph)
+- AI generation produces brand-consistent content
+- 5-7 minute live demo runs smoothly  
+- Can explain technical decisions and handle Q&A
+- Deployed on free hosting (Railway + Vercel)
+
+GETTING STARTED COMMANDS
+=========================
+
+# 1. Create project structure
+mkdir system-design-capstone
+cd system-design-capstone
+
+# 2. Backend setup  
+mkdir backend && cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install fastapi uvicorn python-dotenv neo4j requests beautifulsoup4 pillow colorthief httpx
+
+# 3. Frontend setup
+cd .. && npx create-vite@latest frontend -- --template react
+cd frontend && npm install axios react-router-dom
+npm install -D tailwindcss postcss autoprefixer
+
+# 4. Start development
+# Backend: uvicorn app.main:app --reload  
+# Frontend: npm run dev
+
+IMPORTANT CONSTRAINTS
+=====================
+- No Docker - Run everything locally or on cloud free tiers
+- Free only - Total monthly cost must be < $15
+- 8-week timeline - Must be demo-ready by end of capstone period
+- Educational focus - Emphasize learning modern system design patterns
+
+BEGIN WITH: Phase 0 (setup) and follow the 11-phase checklist in 
+docs/architecture/08-implementation-checklist.md for detailed week-by-week tasks.
