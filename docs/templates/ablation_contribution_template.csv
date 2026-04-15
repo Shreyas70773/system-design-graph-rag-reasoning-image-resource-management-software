@@ -1,0 +1,2 @@
+experiment_id,base_method,ablation_method,metric_name,base_value,ablation_value,absolute_delta,relative_delta_percent,effect_size,adjusted_p_value,interpretation
+exp_sample,graph_guided,graph_guided:without_color_regularizer,delta_e_ciede2000_mean,3.9123,5.1042,1.1919,30.47,0.41,0.0123,color regularizer materially improves color fidelity

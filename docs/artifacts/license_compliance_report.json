@@ -1,0 +1,160 @@
+{
+  "scope": "deployment",
+  "policy_path": "C:\\Users\\Shreyas Sunil\\Downloads\\system-design-graph-rag-reasoning-image-resource-management-software-main\\docs\\license_policy.json",
+  "requirements_path": "C:\\Users\\Shreyas Sunil\\Downloads\\system-design-graph-rag-reasoning-image-resource-management-software-main\\backend\\requirements.txt",
+  "passed": true,
+  "violations": [],
+  "unknown_dependencies": [],
+  "checked": [
+    {
+      "package": "fastapi",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "uvicorn",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "pydantic",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "pydantic-settings",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "python-dotenv",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "neo4j",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "httpx",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "requests",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "openai",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "beautifulsoup4",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "lxml",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "pillow",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "colorthief",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "numpy",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    },
+    {
+      "package": "python-multipart",
+      "decision": "allowed",
+      "allowed_scopes": [
+        "research",
+        "deployment"
+      ],
+      "scope": "deployment",
+      "allowed": true
+    }
+  ]
+}

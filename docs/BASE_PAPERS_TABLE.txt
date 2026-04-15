@@ -1,0 +1,40 @@
+BASE PAPERS SUMMARY (FOR PPT TABLE - 11 ROWS)
+==============================================
+
+┌─────────────┬────────────────────────────────────────┬────────────────────────────────────────┐
+│ FIELD       │ PAPER 1                                │ PAPER 2                                │
+├─────────────┼────────────────────────────────────────┼────────────────────────────────────────┤
+│ Paper Name  │ Graph Retrieval-Augmented Generation:  │ From Local to Global: A Graph RAG      │
+│             │ A Survey                               │ Approach to Query-Focused Summarization│
+├─────────────┼────────────────────────────────────────┼────────────────────────────────────────┤
+│ Authors     │ Peng et al. (Peking Univ, Zhejiang     │ Edge et al. (Microsoft Research)       │
+│             │ Univ, Ant Group) - 2024                │ - 2024                                 │
+├─────────────┼────────────────────────────────────────┼────────────────────────────────────────┤
+│ Abstract    │ First comprehensive survey of GraphRAG │ Graph-based approach for query-focused │
+│             │ methods. Formalizes 3-stage pipeline   │ summarization using community detection│
+│             │ to address RAG limitations             │ and hierarchical summaries             │
+├─────────────┼────────────────────────────────────────┼────────────────────────────────────────┤
+│ Methodology │ G-Indexing → G-Retrieval → G-Generate  │ 1) Build entity knowledge graph        │
+│             │ Retrieves nodes/triplets/paths/        │ 2) Detect communities (Leiden algo)    │
+│             │ subgraphs instead of text chunks       │ 3) Pre-generate summaries per community│
+├─────────────┼────────────────────────────────────────┼────────────────────────────────────────┤
+│ Findings    │ • RAG neglects relationships           │ • Outperforms RAG on global queries    │
+│             │ • Graph captures relational knowledge  │ • Hierarchical summaries enable both   │
+│             │ • Hybrid retrieval balances accuracy   │   local and global question answering  │
+│             │   and efficiency                       │ • Scales to large document collections │
+└─────────────┴────────────────────────────────────────┴────────────────────────────────────────┘
+
+
+COPY-PASTE VERSION FOR PPT:
+===========================
+
+| Field       | Paper 1 (Peng et al.)                          | Paper 2 (Edge et al.)                          |
+|-------------|------------------------------------------------|------------------------------------------------|
+| Paper Name  | Graph Retrieval-Augmented Generation: A Survey | From Local to Global: A GraphRAG Approach      |
+| Authors     | Peng et al. (Peking/Zhejiang Univ, Ant) 2024   | Edge et al. (Microsoft Research) 2024          |
+| Abstract    | First survey of GraphRAG; formalizes 3-stage   | Graph-based query summarization using          |
+|             | pipeline to fix RAG limitations                | community detection & hierarchical summaries   |
+| Methodology | G-Index → G-Retrieve → G-Generate;             | Build entity graph → Leiden community          |
+|             | retrieves graph elements not text chunks       | detection → pre-generate community summaries   |
+| Findings    | RAG neglects relationships; graphs capture     | Beats RAG on global queries; hierarchical      |
+|             | relational knowledge; hybrid approach best     | summaries enable local + global QA at scale    |

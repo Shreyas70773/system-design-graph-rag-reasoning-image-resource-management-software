@@ -1,0 +1,409 @@
+================================================================================
+                    NEO4J GRAPH SCHEMA
+        Brand-Aligned Content Generation Platform with GraphRAG
+================================================================================
+
+================================================================================
+                            NODE TYPES
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BRAND (Central Node)                                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING (UNIQUE) - UUID identifier                                  │
+│    - name: STRING - Brand display name                                      │
+│    - website: STRING (INDEXED) - Brand website URL                          │
+│    - tagline: STRING - Brand slogan/tagline                                 │
+│    - industry: STRING - Business industry category                          │
+│    - description: STRING - Brand description                                │
+│    - voice_tone: STRING - Brand voice characteristics                       │
+│    - target_audience: STRING - Target demographic                           │
+│    - created_at: DATETIME - Creation timestamp                              │
+│    - updated_at: DATETIME - Last update timestamp                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LOGO                                                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - url: STRING - Logo image URL                                           │
+│    - quality_score: FLOAT - Quality rating (0.0-1.0)                        │
+│    - source: STRING - How logo was obtained (scraped, uploaded)             │
+│    - width: INTEGER - Image width in pixels                                 │
+│    - height: INTEGER - Image height in pixels                               │
+│    - format: STRING - Image format (png, jpg, svg)                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  COLOR / ColorNode                                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - hex: STRING (UNIQUE) - Hex color code (#RRGGBB)                        │
+│    - name: STRING - Human-readable color name                               │
+│    - rgb: LIST<INTEGER> - RGB values [R, G, B]                              │
+│    - role: STRING - Color role (primary, secondary, accent)                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PRODUCT / ProductNode                                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING (UNIQUE) - Product identifier                               │
+│    - name: STRING (INDEXED) - Product name                                  │
+│    - price: STRING - Product price                                          │
+│    - category: STRING - Product category                                    │
+│    - description: STRING - Product description                              │
+│    - image_url: STRING - Product image URL                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  StyleNode                                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Style identifier                                          │
+│    - aesthetic: STRING - Visual aesthetic (modern, vintage, minimal)        │
+│    - mood: STRING - Emotional tone (professional, playful, luxurious)       │
+│    - influences: LIST<STRING> - Design influences                           │
+│    - typography_style: STRING - Font style preferences                      │
+│    - visual_elements: LIST<STRING> - Common visual elements                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  CompositionNode                                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Composition identifier                                    │
+│    - layout: STRING - Preferred layout style                                │
+│    - focal_point: STRING - Where focus should be                            │
+│    - spacing: STRING - Spacing preferences                                  │
+│    - alignment: STRING - Alignment preferences                              │
+│    - aspect_ratio: STRING - Preferred aspect ratio                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  CharacterNode / Character                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Character identifier                                      │
+│    - name: STRING - Character name                                          │
+│    - description: STRING - Physical description                             │
+│    - role: STRING - Character role (mascot, spokesperson)                   │
+│    - reference_image_url: STRING - Reference image URL                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FaceEmbedding                                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Embedding identifier                                      │
+│    - vector: LIST<FLOAT> - 512-dimensional face embedding vector            │
+│    - created_at: DATETIME - Creation timestamp                              │
+│    - model_version: STRING - Embedding model version                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Generation                                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING (UNIQUE) - Generation identifier                            │
+│    - prompt: STRING - User's original prompt                                │
+│    - compiled_prompt: STRING - Final prompt sent to AI                      │
+│    - image_url: STRING - Generated image URL                                │
+│    - model_used: STRING - AI model used                                     │
+│    - parameters: MAP - Generation parameters (seed, steps, etc.)            │
+│    - reasoning: STRING - LLM reasoning trace                                │
+│    - created_at: DATETIME - Generation timestamp                            │
+│    - processing_time_ms: INTEGER - Time taken to generate                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Feedback                                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Feedback identifier                                       │
+│    - rating: INTEGER - User rating (1-5)                                    │
+│    - liked_aspects: LIST<STRING> - What user liked                          │
+│    - disliked_aspects: LIST<STRING> - What user disliked                    │
+│    - comment: STRING - Text feedback                                        │
+│    - created_at: DATETIME - Feedback timestamp                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LearnedPreference                                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Preference identifier                                     │
+│    - attribute: STRING - What aspect (color, composition, style)            │
+│    - preference_type: STRING - positive/negative                            │
+│    - value: STRING - Specific preference value                              │
+│    - reasoning: STRING - Why this was learned (from LLM)                    │
+│    - confidence: FLOAT - Confidence score (0.0-1.0)                         │
+│    - sample_count: INTEGER - Number of feedbacks analyzed                   │
+│    - created_at: DATETIME - When preference was learned                     │
+│    - updated_at: DATETIME - Last update timestamp                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Constraint                                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Properties:                                                                │
+│    - id: STRING - Constraint identifier                                     │
+│    - type: STRING - Constraint type (must_include, must_exclude, style)     │
+│    - value: STRING - Constraint value                                       │
+│    - priority: INTEGER - Constraint priority (1-10)                         │
+│    - active: BOOLEAN - Whether constraint is active                         │
+│    - created_at: DATETIME - Creation timestamp                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+                          RELATIONSHIPS
+================================================================================
+
+                              ┌──────────┐
+                              │  BRAND   │
+                              └────┬─────┘
+                                   │
+        ┌──────────────────────────┼──────────────────────────┐
+        │              │           │           │              │
+        ▼              ▼           ▼           ▼              ▼
+   [:HAS_LOGO]   [:HAS_COLOR]  [:HAS_STYLE]  [:SELLS]   [:LEARNED]
+        │              │           │           │              │
+        ▼              ▼           ▼           ▼              ▼
+    ┌──────┐     ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────────────┐
+    │ Logo │     │ColorNode│  │StyleNode│  │ Product │  │LearnedPreference│
+    └──────┘     └─────────┘  └─────────┘  └─────────┘  └────────┬────────┘
+                                                                 │
+                                                         [:DERIVED_FROM]
+                                                                 │
+                                                                 ▼
+                                                          ┌────────────┐
+                                                          │ Generation │
+                                                          └────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_LOGO]                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_LOGO]->(Logo)                                     │
+│  Cardinality: 1:1 (one logo per brand)                                      │
+│  Description: Links brand to its logo image                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_COLOR] / [:USES_COLOR]                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_COLOR {role: "primary"}]->(ColorNode)             │
+│  Cardinality: 1:N (multiple colors per brand)                               │
+│  Properties:                                                                │
+│    - role: STRING - Color role (primary, secondary, accent)                 │
+│  Description: Links brand to its color palette                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_STYLE]                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_STYLE]->(StyleNode)                               │
+│  Cardinality: 1:N (can have multiple style nodes)                           │
+│  Description: Links brand to its visual style attributes                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_COMPOSITION]                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_COMPOSITION]->(CompositionNode)                   │
+│  Cardinality: 1:1 (one composition preference per brand)                    │
+│  Description: Links brand to composition/layout preferences                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:SELLS]                                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:SELLS]->(Product)                                     │
+│  Cardinality: 1:N (brand sells multiple products)                           │
+│  Description: Links brand to its products/services                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_CHARACTER]                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_CHARACTER]->(CharacterNode)                       │
+│  Cardinality: 1:N (brand can have multiple characters)                      │
+│  Description: Links brand to its mascots/spokespersons                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_EMBEDDING]                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Character)-[:HAS_EMBEDDING]->(FaceEmbedding)                   │
+│  Cardinality: 1:1 (one embedding per character)                             │
+│  Description: Links character to face embedding for consistency             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:GENERATED]                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:GENERATED]->(Generation)                              │
+│  Cardinality: 1:N (brand has many generations)                              │
+│  Description: Links brand to its generated content                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:RECEIVED_FEEDBACK]                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Generation)-[:RECEIVED_FEEDBACK]->(Feedback)                   │
+│  Cardinality: 1:N (generation can have multiple feedbacks)                  │
+│  Description: Links generation to user feedback                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:LEARNED]                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:LEARNED {confidence: 0.85}]->(LearnedPreference)      │
+│  Cardinality: 1:N (brand learns many preferences)                           │
+│  Properties:                                                                │
+│    - confidence: FLOAT - How confident this preference is                   │
+│  Description: Links brand to learned user preferences                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:DERIVED_FROM]                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (LearnedPreference)-[:DERIVED_FROM]->(Generation)               │
+│  Cardinality: N:1 (preference can derive from multiple generations)         │
+│  Description: Traces which generation led to this preference                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_CONSTRAINT]                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_CONSTRAINT]->(Constraint)                         │
+│  Cardinality: 1:N (brand can have multiple constraints)                     │
+│  Description: Links brand to hard constraints for generation                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RELATIONSHIP: [:HAS_LEARNED_PREFERENCE]                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Direction: (Brand)-[:HAS_LEARNED_PREFERENCE]->(LearnedPreference)          │
+│  Cardinality: 1:N (alternative to [:LEARNED])                               │
+│  Description: Same as [:LEARNED], used in some modules                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+                        COMPLETE GRAPH STRUCTURE
+================================================================================
+
+                                    ┌───────────────┐
+                                    │   Constraint  │
+                                    └───────┬───────┘
+                                            │
+                                   [:HAS_CONSTRAINT]
+                                            │
+┌──────┐     [:HAS_LOGO]            ┌───────┴───────┐           [:SELLS]     ┌─────────┐
+│ Logo │◄───────────────────────────│               │──────────────────────►│ Product │
+└──────┘                            │               │                        └─────────┘
+                                    │               │
+┌───────────┐  [:HAS_COLOR]         │     BRAND     │       [:HAS_STYLE]   ┌───────────┐
+│ ColorNode │◄──────────────────────│               │─────────────────────►│ StyleNode │
+└───────────┘                       │               │                       └───────────┘
+                                    │               │
+┌─────────────────┐  [:HAS_COMPOSITION]  │               │   [:HAS_CHARACTER]   ┌───────────────┐
+│ CompositionNode │◄─────────────────────│               │──────────────────────►│ CharacterNode │
+└─────────────────┘                      └───────┬───────┘                       └───────┬───────┘
+                                                 │                                       │
+                    ┌────────────────────────────┼───────────────────┐          [:HAS_EMBEDDING]
+                    │                            │                   │                   │
+               [:LEARNED]                  [:GENERATED]    [:HAS_LEARNED_PREFERENCE]     ▼
+                    │                            │                   │           ┌───────────────┐
+                    ▼                            ▼                   │           │ FaceEmbedding │
+         ┌─────────────────────┐          ┌────────────┐             │           └───────────────┘
+         │  LearnedPreference  │◄─────────│ Generation │◄────────────┘
+         └──────────┬──────────┘          └─────┬──────┘
+                    │                           │
+            [:DERIVED_FROM]            [:RECEIVED_FEEDBACK]
+                    │                           │
+                    └───────────►               ▼
+                                         ┌──────────┐
+                                         │ Feedback │
+                                         └──────────┘
+
+
+================================================================================
+                            CONSTRAINTS
+================================================================================
+
+CREATE CONSTRAINT brand_id IF NOT EXISTS 
+FOR (b:Brand) REQUIRE b.id IS UNIQUE;
+
+CREATE CONSTRAINT color_hex IF NOT EXISTS 
+FOR (c:Color) REQUIRE c.hex IS UNIQUE;
+
+
+================================================================================
+                             INDEXES
+================================================================================
+
+CREATE INDEX brand_website IF NOT EXISTS 
+FOR (b:Brand) ON (b.website);
+
+CREATE INDEX brand_name IF NOT EXISTS 
+FOR (b:Brand) ON (b.name);
+
+CREATE INDEX product_name IF NOT EXISTS 
+FOR (p:Product) ON (p.name);
+
+
+================================================================================
+                        EXAMPLE CYPHER QUERIES
+================================================================================
+
+-- Get full brand context (for content generation)
+MATCH (b:Brand {id: $brand_id})
+OPTIONAL MATCH (b)-[:HAS_LOGO]->(logo:Logo)
+OPTIONAL MATCH (b)-[cr:HAS_COLOR]->(c:ColorNode)
+OPTIONAL MATCH (b)-[sr:HAS_STYLE]->(s:StyleNode)
+OPTIONAL MATCH (b)-[:HAS_COMPOSITION]->(comp:CompositionNode)
+OPTIONAL MATCH (b)-[:SELLS]->(p:ProductNode)
+OPTIONAL MATCH (b)-[:HAS_CHARACTER]->(ch:CharacterNode)
+OPTIONAL MATCH (b)-[:LEARNED]->(lp:LearnedPreference)
+RETURN b, logo, collect(DISTINCT c) as colors, 
+       collect(DISTINCT s) as styles, comp, 
+       collect(DISTINCT p) as products,
+       collect(DISTINCT ch) as characters,
+       collect(DISTINCT lp) as learned_preferences
+
+-- Create learned preference from feedback
+MATCH (b:Brand {id: $brand_id})
+MATCH (g:Generation {id: $generation_id})
+CREATE (lp:LearnedPreference {
+    id: $pref_id,
+    attribute: $attribute,
+    preference_type: $type,
+    value: $value,
+    reasoning: $reasoning,
+    confidence: $confidence,
+    created_at: datetime()
+})
+CREATE (b)-[:LEARNED {confidence: $confidence}]->(lp)
+CREATE (lp)-[:DERIVED_FROM]->(g)
+
+-- Get brand's learned preferences
+MATCH (b:Brand {id: $brand_id})-[:LEARNED]->(lp:LearnedPreference)
+WHERE lp.confidence >= 0.5
+RETURN lp ORDER BY lp.confidence DESC
+
+-- Get generation history with feedback
+MATCH (b:Brand {id: $brand_id})-[:GENERATED]->(g:Generation)
+OPTIONAL MATCH (g)-[:RECEIVED_FEEDBACK]->(f:Feedback)
+RETURN g, collect(f) as feedback
+ORDER BY g.created_at DESC
+LIMIT 10
+
+
+================================================================================
+                    Document generated for Capstone Project
+                             January 2026
+================================================================================

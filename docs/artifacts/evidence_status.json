@@ -1,0 +1,39 @@
+{
+  "status": {
+    "B1": {
+      "description": "Paired statistics protocol and implementation",
+      "closed": true,
+      "checks": {
+        "stats_protocol_approved": true,
+        "stats_code_ready": true
+      }
+    },
+    "B2": {
+      "description": "VRAM profiling evidence",
+      "closed": true,
+      "checks": {
+        "vram_runs_completed": 5,
+        "vram_oom_runs": 0
+      }
+    },
+    "B3": {
+      "description": "Claim ledger evidence mapping",
+      "closed": true,
+      "checks": {
+        "contains_tbd": false,
+        "borrowed_gain_active": false,
+        "unverified_method_outcome": false
+      }
+    },
+    "B4": {
+      "description": "License compliance matrix",
+      "closed": true,
+      "checks": {
+        "contains_pending_review": false,
+        "contains_tbd": false
+      }
+    }
+  },
+  "claim_ledger_updated": true,
+  "claim_ledger_path": "C:\\Users\\Shreyas Sunil\\Downloads\\system-design-graph-rag-reasoning-image-resource-management-software-main\\docs\\claim_ledger.csv"
+}

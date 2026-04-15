@@ -1,0 +1,563 @@
+=================================================================================
+           CAPSTONE PROJECT: TECHNICAL EXPLANATION FOR FACULTY
+             Brand-Aligned Content Generation Platform with GraphRAG
+=================================================================================
+
+=================================================================================
+SECTION 1: BASE PAPERS & FOUNDATIONAL RESEARCH
+=================================================================================
+
+Our system is built upon two major research directions:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BASE PAPER 1: Graph Retrieval-Augmented Generation (GraphRAG)              │
+│  Authors: Peng et al. (2024) - Survey Paper                                 │
+│  Source: arXiv:2408.08921                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  CORE PROBLEM SOLVED:                                                       │
+│  Traditional RAG (Retrieval-Augmented Generation) retrieves text chunks     │
+│  based on semantic similarity. However, it:                                 │
+│    - NEGLECTS RELATIONSHIPS between entities                                │
+│    - Creates REDUNDANT INFORMATION when concatenating text                  │
+│    - LACKS GLOBAL INFORMATION (can't see the full picture)                  │
+│                                                                             │
+│  GRAPHRAG SOLUTION:                                                         │
+│  Instead of text chunks, retrieve GRAPH ELEMENTS (nodes, edges, paths,      │
+│  subgraphs) that capture relational knowledge:                              │
+│                                                                             │
+│    Query: "How does Brand X maintain visual consistency?"                   │
+│                                                                             │
+│    Traditional RAG:                                                         │
+│    └── Returns: "Brand X uses blue. Blue is primary. Logo is blue."        │
+│        (Redundant, no relationships shown)                                  │
+│                                                                             │
+│    GraphRAG:                                                                │
+│    └── Returns: (Brand)-[:HAS_COLOR {role:primary}]->(Blue #1E88E5)        │
+│                 (Blue)-[:USED_IN]->(Logo, Headers, CTAs)                   │
+│        (Structured, shows relationships, no redundancy)                     │
+│                                                                             │
+│  THREE-STAGE PIPELINE (from paper):                                         │
+│    1. G-Indexing: Build/index the knowledge graph                          │
+│    2. G-Retrieval: Query the graph for relevant subgraphs                  │
+│    3. G-Generation: Use retrieved graph data to enhance LLM output         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BASE PAPER 2: Microsoft GraphRAG (Local-to-Global)                         │
+│  Authors: Edge et al. (2024)                                                │
+│  Source: arXiv:2404.16130                                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  KEY CONTRIBUTION:                                                          │
+│  Community Detection + Hierarchical Summarization                           │
+│                                                                             │
+│  Their approach:                                                            │
+│    1. Build entity-based knowledge graph from documents                     │
+│    2. Detect communities (clusters of related entities)                     │
+│    3. Pre-generate summaries for each community                             │
+│    4. Query can access LOCAL (specific entities) or GLOBAL (summaries)     │
+│                                                                             │
+│  WHY THIS MATTERS FOR US:                                                   │
+│  Brand identity is inherently HIERARCHICAL:                                 │
+│    - Global: Overall brand aesth9oetic, industry positioning                  │
+│    - Local: Specific color hex codes, logo placement rules                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+=================================================================================
+SECTION 2: HOW RELATIONSHIPS ARE FETCHED (DETAILED TECHNICAL FLOW)
+=================================================================================
+
+Our system uses Neo4j (Graph Database) with Cypher queries.
+Here's the EXACT process when a generation request comes in:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: SINGLE CYPHER QUERY RETRIEVES ALL BRAND DNA                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  The query (from brand_dna_service.py, lines 105-141):                      │
+│                                                                             │
+│  MATCH (b:Brand {id: $brand_id})                                            │
+│                                                                             │
+│  OPTIONAL MATCH (b)-[:HAS_LOGO]->(logo:Logo)                                │
+│  OPTIONAL MATCH (b)-[cr:HAS_COLOR]->(c:ColorNode)                           │
+│  OPTIONAL MATCH (b)-[sr:HAS_STYLE]->(s:StyleNode)                           │
+│  OPTIONAL MATCH (b)-[:HAS_COMPOSITION]->(comp:CompositionNode)              │
+│  OPTIONAL MATCH (b)-[:SELLS]->(p:ProductNode)                               │
+│  OPTIONAL MATCH (b)-[:HAS_CHARACTER]->(ch:CharacterNode)                    │
+│  OPTIONAL MATCH (b)-[:LEARNED]->(lp:LearnedPreference)                      │
+│                                                                             │
+│  RETURN b, logo, colors, styles, composition, products,                     │
+│         characters, learned_preferences                                     │
+│                                                                             │
+│  KEY INSIGHT:                                                               │
+│  One query traverses 7 relationship types simultaneously.                   │
+│  In SQL this would require 7 JOIN operations or 7 separate queries.        │
+│  Graph databases excel at relationship traversal - O(1) per hop.           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: RELATIONSHIP PROPERTIES ARE PRESERVED                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Unlike foreign keys in SQL, Neo4j relationships have PROPERTIES:           │
+│                                                                             │
+│  (Brand)-[:HAS_COLOR {role: "primary", weight: 0.8}]->(ColorNode)           │
+│                   ▲                                                         │
+│                   │                                                         │
+│            Relationship properties tell us:                                 │
+│            - This color is "primary" (not secondary/accent)                 │
+│            - Weight 0.8 = should be used 80% of the time                    │
+│                                                                             │
+│  (Brand)-[:LEARNED {confidence: 0.85}]->(LearnedPreference)                 │
+│                   ▲                                                         │
+│                   │                                                         │
+│            Confidence score indicates how reliable this preference is       │
+│                                                                             │
+│  This metadata on relationships is IMPOSSIBLE in traditional RDBMS.        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: RESULTS MAPPED TO BrandDNA DATACLASS                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  The query results are structured into a BrandDNA object:                   │
+│                                                                             │
+│  @dataclass                                                                 │
+│  class BrandDNA:                                                            │
+│      brand_id: str                                                          │
+│      brand_name: str                                                        │
+│      logo_url: Optional[str]                                                │
+│      colors: List[Dict]       # [{hex, name, role, weight}]                 │
+│      styles: List[Dict]       # [{type, keywords, negative_keywords}]       │
+│      composition: Dict        # {layout, text_position, overlay_opacity}    │
+│      products: List[Dict]     # [{id, name, category, image_url}]           │
+│      characters: List[Dict]   # [{id, name, reference_image_url}]           │
+│      learned_preferences: List[Dict]  # [{trigger, applies, confidence}]    │
+│                                                                             │
+│  This object holds the COMPLETE brand identity extracted from the graph.   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+=================================================================================
+SECTION 3: WHAT HAPPENS AFTER FETCHING (IDEAL PROCESSING PIPELINE)
+=================================================================================
+
+After retrieving the BrandDNA, here's the COMPLETE processing pipeline:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        FULL GENERATION PIPELINE                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────┐                                                           │
+│  │ User Prompt  │ "Create a coffee ad for our new blend"                   │
+│  └──────┬───────┘                                                           │
+│         │                                                                   │
+│         ▼                                                                   │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 1: GRAPH RETRIEVAL (Neo4j)                                  │      │
+│  │                                                                  │      │
+│  │ Single Cypher query fetches:                                     │      │
+│  │ - Brand → Logo (url, quality_score)                              │      │
+│  │ - Brand → Colors (hex, name, role, weight)                       │      │
+│  │ - Brand → Styles (keywords, negative_keywords)                   │      │
+│  │ - Brand → Products (name, category, image_url)                   │      │
+│  │ - Brand → LearnedPreferences (trigger, applies, confidence)      │      │
+│  │                                                                  │      │
+│  │ Output: BrandDNA object with all relationships                   │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│         │                                                                  │
+│         ▼                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 2: LLM PLANNING (Groq - Llama 3.3 70B)                      │      │
+│  │                                                                   │      │
+│  │ Input: User prompt + BrandDNA                                    │      │
+│  │                                                                   │      │
+│  │ LLM analyzes and outputs GenerationPlan:                         │      │
+│  │ {                                                                 │      │
+│  │   "subject": "coffee cup with steam",                            │      │
+│  │   "scene_description": "warm morning scene",                     │      │
+│  │   "mood": "inviting, cozy",                                      │      │
+│  │   "needs_colors": true,                                          │      │
+│  │   "color_strength": 0.8,                                         │      │
+│  │   "suggested_layout": "centered",                                │      │
+│  │   "applicable_preferences": ["prefer warm lighting"],            │      │
+│  │   "reasoning_steps": [                                           │      │
+│  │     "Coffee ad → need warm, inviting mood",                      │      │
+│  │     "Brand colors are brown/gold → fits coffee theme",           │      │
+│  │     "Previous feedback: user preferred warm lighting"            │      │
+│  │   ]                                                              │      │
+│  │ }                                                                 │      │
+│  │                                                                   │      │
+│  │ KEY: Reasoning traces provide EXPLAINABILITY                     │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│         │                                                                   │
+│         ▼                                                                   │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 3: BRAND CONDITIONING (BrandDNA → BrandCondition)           │      │
+│  │                                                                   │      │
+│  │ Convert graph data to generation parameters:                     │      │
+│  │                                                                   │      │
+│  │ BrandCondition {                                                 │      │
+│  │   primary_colors: ["#8B4513", "#FFD700"],                        │      │
+│  │   color_weights: {"#8B4513": 0.8, "#FFD700": 0.2},               │      │
+│  │   style_keywords: ["warm", "cozy", "premium"],                   │      │
+│  │   negative_keywords: ["cold", "sterile", "generic"],             │      │
+│  │   layout: "centered",                                            │      │
+│  │   aspect_ratio: "1:1"                                            │      │
+│  │ }                                                                │      │
+│  │                                                                  │      │
+│  │ This maps SEMANTIC graph data to NUMERICAL parameters            │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│         │                                                                  │
+│         ▼                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 4: PROMPT COMPILATION (PromptCompilationEngine)             │      │
+│  │                                                                  │      │
+│  │ Merge multiple sources into final prompt:                        │      │
+│  │                                                                  │      │
+│  │ 4-LAYER PROMPT STRUCTURE:                                        │      │
+│  │                                                                  │      │
+│  │ Layer 1 - Base (User Intent):                                    │      │
+│  │   "coffee cup with steam, morning scene"                         │      │
+│  │                                                                  │      │
+│  │ Layer 2 - Brand (From Graph):                                    │      │
+│  │   "warm brown #8B4513, gold accents #FFD700, premium feel"   │      │
+│  │                                                                  │      │
+│  │ Layer 3 - Quality Boosters:                                      │      │
+│  │   "8k resolution, sharp focus, professional photography"         │      │
+│  │                                                                  │      │
+│  │ Layer 4 - Control Directives:                                    │      │
+│  │   "no text, no letters, no watermarks"                           │      │
+│  │                                                                  │      │
+│  │ NEGATIVE PROMPT (from graph + defaults):                         │      │
+│  │   "cold colors, blue tones, blurry, pixelated, text"             │      │
+│  │                                                                  │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│         │                                                                  │
+│         ▼                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 5: IMAGE GENERATION (OpenRouter API → Gemini 2.5 Flash)     │      │
+│  │                                                                  │      │
+│  │ API call with compiled prompt:                                   │      │
+│  │ {                                                                │     │
+│  │   "model": "google/gemini-2.5-flash-preview",                    │      │
+│  │   "prompt": [compiled_positive_prompt],                          │      │
+│  │   "negative_prompt": [compiled_negative_prompt]                  │      │
+│  │ }                                                                 │      │
+│  │                                                                   │      │
+│  │ Returns: Base64-encoded image                                    │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│         │                                                                   │
+│         ▼                                                                   │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 6: POST-PROCESSING (PIL-Based)                              │      │
+│  │                                                                  │      │
+│  │ 6a. Text Overlay:                                                │      │
+│  │     - Analyze dominant color in text region                      │      │
+│  │     - Calculate luminance: L = (0.299R + 0.587G + 0.114B)/255    │      │
+│  │     - Choose WHITE text if L < 0.5, else BLACK                   │      │
+│  │     - Apply gradient overlay (alpha 0→180) for readability       │      │
+│  │     - Add shadow (3-4px offset)                                  │      │
+│  │                                                                  │      │
+│  │ 6b. Logo Compositing:                                            │      │
+│  │     - Scale logo to 12% of image width                           │      │
+│  │     - Resize with LANCZOS resampling (high quality)              │      │
+│  │     - Apply 90% opacity via alpha channel                        │      │
+│  │     - Position: bottom_right with 3% margin                      │      │
+│  │                                                                  │      │
+│  │ KEY: We DON'T rely on AI for text (unreliable).                  │      │
+│  │      PIL gives pixel-perfect control.                            │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│         │                                                                  │
+│         ▼                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │ STEP 7: STORE GENERATION IN GRAPH                                │      │
+│  │                                                                  │      │
+│  │ CREATE (g:Generation {                                           │      │
+│  │   id: $gen_id,                                                   │      │
+│  │   prompt: $user_prompt,                                          │      │
+│  │   compiled_prompt: $full_prompt,                                 │      │
+│  │   image_url: $result_url,                                        │      │
+│  │   reasoning: $llm_reasoning,                                     │      │
+│  │   created_at: datetime()                                         │      │
+│  │ })                                                               │      │
+│  │ CREATE (b:Brand)-[:GENERATED]->(g)                               │      │
+│  │                                                                  │      │
+│  │ This creates TRACEABILITY for the learning loop.                 │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+=================================================================================
+SECTION 4: OUR NOVELTY / RESEARCH CONTRIBUTIONS
+=================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  NOVELTY 1: DOMAIN-SPECIFIC GRAPH SCHEMA FOR BRAND IDENTITY                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EXISTING WORK:                                                             │
+│  - GraphRAG papers focus on general knowledge graphs (Wikidata, Freebase)   │
+│  - Or document-based graphs (citation networks)                             │
+│                                                                             │
+│  OUR CONTRIBUTION:                                                          │
+│  - First application of GraphRAG to BRAND IDENTITY modeling                 │
+│  - Custom schema capturing visual brand elements:                           │
+│                                                                             │
+│    (Brand)──[:HAS_COLOR {role, weight}]──►(ColorNode)                       │
+│           ──[:HAS_STYLE {weight}]──►(StyleNode)                             │
+│           ──[:HAS_COMPOSITION]──►(CompositionNode)                          │
+│           ──[:SELLS]──►(ProductNode)                                        │
+│           ──[:HAS_CHARACTER]──►(CharacterNode)                              │
+│           ──[:LEARNED {confidence}]──►(LearnedPreference)                   │
+│           ──[:GENERATED]──►(Generation)                                     │
+│                                                                             │
+│  - Relationship properties capture SEMANTIC WEIGHT:                         │
+│    - role: "primary" vs "accent"                                            │
+│    - weight: How much to emphasize this color                               │
+│    - confidence: How reliable is this learned preference                    │
+│                                                                             │
+│  WHY IT MATTERS:                                                            │
+│  Brand identity isn't just a list of attributes - it's RELATIONSHIPS.       │
+│  "Blue is primary" is different from "Blue is accent"                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  NOVELTY 2: LLM-BASED GENERATION PLANNING ("THINK FIRST")                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EXISTING WORK:                                                             │
+│  - Most systems do: Prompt → Retrieve → Generate (linear)                   │
+│  - No reasoning about WHAT to retrieve or WHY                               │
+│                                                                             │
+│  OUR CONTRIBUTION:                                                          │
+│  - Insert LLM "planning" step between retrieval and generation              │
+│  - LLM analyzes prompt + brand context to decide:                           │
+│    - Which graph nodes are relevant                                         │
+│    - How strongly to condition on each element                              │
+│    - What composition/layout fits the request                               │
+│                                                                             │
+│  GENERATION PLAN OUTPUT:                                                    │
+│  {                                                                          │
+│    "needs_colors": true,                                                    │
+│    "needs_products": ["coffee blend"],                                      │
+│    "color_strength": 0.8,         // How much to emphasize brand colors     │
+│    "suggested_layout": "centered",                                          │
+│    "applicable_preferences": [...],                                         │
+│    "reasoning_steps": [            // EXPLAINABILITY                        │
+│      "User wants coffee ad → retrieve warm colors",                         │
+│      "Brand has gold accent → fits premium positioning",                    │
+│      "Previous feedback preferred centered layouts"                         │
+│    ]                                                                        │
+│  }                                                                          │
+│                                                                             │
+│  WHY IT MATTERS:                                                            │
+│  - DYNAMIC conditioning (not all colors always apply)                       │
+│  - EXPLAINABLE decisions (reasoning traces for debugging)                   │
+│  - CONTEXT-AWARE (coffee ad ≠ tech product ad)                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  NOVELTY 3: CONTINUOUS LEARNING VIA FEEDBACK → GRAPH UPDATES                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EXISTING WORK:                                                             │
+│  - Static knowledge graphs (don't learn from usage)                         │
+│  - Fine-tuning requires retraining models                                   │
+│                                                                             │
+│  OUR CONTRIBUTION:                                                          │
+│  - Feedback creates NEW NODES in the graph (no retraining)                  │
+│  - LLM analyzes feedback to extract preferences:                            │
+│                                                                             │
+│  FEEDBACK FLOW:                                                             │
+│                                                                             │
+│  User: "I don't like cold blue tones"                                       │
+│           │                                                                 │
+│           ▼                                                                 │
+│  LLM Analysis (Groq):                                                       │
+│  {                                                                          │
+│    "trigger": "blue tones",                                                 │
+│    "applies": "avoid cold colors",                                          │
+│    "aspect": "color",                                                       │
+│    "preference_type": "negative"                                            │
+│  }                                                                          │
+│           │                                                                 │
+│           ▼                                                                 │
+│  Graph Update (Cypher):                                                     │
+│                                                                             │
+│  CREATE (lp:LearnedPreference {                                             │
+│    trigger: "blue tones",                                                   │
+│    applies: "avoid cold colors",                                            │
+│    aspect: "color",                                                         │
+│    preference_type: "negative",                                             │
+│    confidence: 0.75                                                         │
+│  })                                                                         │
+│  CREATE (brand)-[:LEARNED {confidence: 0.75}]->(lp)                         │
+│  CREATE (lp)-[:DERIVED_FROM]->(generation)                                  │
+│                                                                             │
+│  CONFIDENCE CALCULATION:                                                    │
+│  confidence = (sample_factor × 0.4) + (consistency × 0.6)                   │
+│                                                                             │
+│  WHERE:                                                                     │
+│    sample_factor = min(1.0, sample_count / 5)                               │
+│    consistency = (positive_count / total_count) for same trigger            │
+│                                                                             │
+│  WHY IT MATTERS:                                                            │
+│  - System IMPROVES over time without retraining                             │
+│  - Preferences are TRACEABLE (linked to specific generations)              │
+│  - Confidence scoring prevents overfitting to single feedback               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  NOVELTY 4: HYBRID PIPELINE (AI Generation + Deterministic Post-Processing)│
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EXISTING WORK:                                                             │
+│  - Either fully AI-generated (text unreliable)                              │
+│  - Or fully template-based (not creative)                                   │
+│                                                                             │
+│  OUR CONTRIBUTION:                                                          │
+│  - AI generates the creative visual content                                 │
+│  - PIL handles pixel-perfect text and logo placement                        │
+│                                                                             │
+│  WHY:                                                                       │
+│  AI models like DALL-E/Stable Diffusion are BAD at text:                   │
+│  - "COFFE SHOP" instead of "COFFEE SHOP"                                    │
+│  - Distorted letters, inconsistent fonts                                    │
+│                                                                             │
+│  OUR APPROACH:                                                              │
+│  1. Tell AI: "NO TEXT, NO LETTERS" (negative prompt)                       │
+│  2. Generate clean visual                                                   │
+│  3. Use PIL to add crisp text with:                                        │
+│     - Automatic contrast (luminance calculation)                            │
+│     - Gradient overlays for readability                                     │
+│     - Precise positioning (percentage-based)                                │
+│     - Brand fonts (loaded from system/custom)                               │
+│                                                                             │
+│  RESULT: Commercial-quality output (AI creativity + typographic precision) │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+=================================================================================
+SECTION 5: ARCHITECTURE SUMMARY
+=================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          SYSTEM ARCHITECTURE                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                          ┌─────────────────┐                                │
+│                          │   FRONTEND      │                                │
+│                          │  (React + Vite) │                                │
+│                          └────────┬────────┘                                │
+│                                   │ REST API                                │
+│                                   ▼                                         │
+│                          ┌─────────────────┐                                │
+│                          │    BACKEND      │                                │
+│                          │   (FastAPI)     │                                │
+│                          └────────┬────────┘                                │
+│                                   │                                         │
+│          ┌────────────────────────┼────────────────────────┐               │
+│          │                        │                        │               │
+│          ▼                        ▼                        ▼               │
+│  ┌───────────────┐       ┌───────────────┐       ┌───────────────┐         │
+│  │   NEO4J       │       │   GROQ API    │       │  OPENROUTER   │         │
+│  │  (Graph DB)   │       │  (LLM Reason) │       │  (Image Gen)  │         │
+│  │               │       │               │       │               │         │
+│  │ Brand DNA     │       │ Llama 3.3 70B │       │ Gemini 2.5    │         │
+│  │ Relationships │       │ Planning      │       │ Flash         │         │
+│  │ Preferences   │       │ Feedback      │       │               │         │
+│  └───────────────┘       └───────────────┘       └───────────────┘         │
+│          │                        │                        │               │
+│          └────────────────────────┼────────────────────────┘               │
+│                                   │                                         │
+│                                   ▼                                         │
+│                          ┌─────────────────┐                                │
+│                          │ POST-PROCESSING │                                │
+│                          │   (PIL/Pillow)  │                                │
+│                          │                 │                                │
+│                          │ - Text Overlay  │                                │
+│                          │ - Logo Composite│                                │
+│                          │ - Color Adjust  │                                │
+│                          └─────────────────┘                                │
+│                                                                             │
+│  OPTIONAL:                                                                  │
+│  ┌───────────────┐                                                          │
+│  │  PERPLEXITY   │ ─── AI Content Discovery (trending topics, ideas)       │
+│  │  Sonar API    │                                                          │
+│  └───────────────┘                                                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+=================================================================================
+SECTION 6: COMPARISON WITH BASE PAPERS
+=================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ASPECT              │ BASE PAPERS         │ OUR IMPLEMENTATION              │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Domain              │ General QA,         │ Brand-aligned image             │
+│                     │ Document retrieval  │ generation                      │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Graph Type          │ Wikidata, Freebase, │ Custom brand identity           │
+│                     │ Document graphs     │ schema with visual semantics    │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Output              │ Text answers        │ Images + text composites        │
+│                     │                     │                                 │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Retrieval           │ Entity/path based   │ Relationship-weighted           │
+│                     │                     │ with role semantics             │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Planning            │ None or basic       │ Full LLM planning with          │
+│                     │                     │ reasoning traces                │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Learning            │ Static graphs       │ Dynamic graph updates           │
+│                     │                     │ from feedback                   │
+├─────────────────────┼─────────────────────┼─────────────────────────────────┤
+│ Post-processing     │ None                │ PIL-based text/logo             │
+│                     │                     │ compositing                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+=================================================================================
+                    SUMMARY: KEY RESEARCH CONTRIBUTIONS
+=================================================================================
+
+1. GRAPH-NATIVE BRAND MODELING
+   - First GraphRAG implementation for visual brand identity
+   - Relationship properties capture semantic weights
+
+2. LLM-BASED PLANNING ("THINK FIRST")
+   - Dynamic, context-aware conditioning decisions
+   - Explainable reasoning traces
+
+3. CONTINUOUS GRAPH LEARNING
+   - Feedback → LLM analysis → New graph nodes
+   - Confidence-scored preferences without retraining
+
+4. HYBRID GENERATION PIPELINE
+   - AI for creative content + PIL for pixel-perfect text
+   - Best of both worlds
+
+5. PRACTICAL IMPLEMENTATION
+   - Full working system (not just research prototype)
+   - React frontend + FastAPI backend + Neo4j
+
+
+=================================================================================
+                    Document prepared for Capstone Faculty Review
+                              January/February 2026
+=================================================================================

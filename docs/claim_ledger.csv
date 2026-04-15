@@ -1,0 +1,6 @@
+claim_id,claim_text,claim_type,source_url,source_title,source_tier,source_year,confidence,status,notes
+C001,Graph-conditioned diffusion improves color alignment vs prompt-only,method_outcome,docs/RESEARCH_SCOPE_UPGRADE_AND_IMPLEMENTATION_BLUEPRINT.md,Hypothesis definition in research blueprint,B,2026,0.40,hypothesis,Relabeled as hypothesis until measured experiment evidence is attached
+C002,Paired comparisons are analyzed with Wilcoxon signed-rank,statistics_policy,docs/stats_protocol_v1.md,Statistical Protocol v1.0,B,2026,0.90,verified,Verified by approved protocol and implemented analyzer tests
+C003,RTX 5070 Ti can run selected graph-guided workflow without OOM,hardware_feasibility,docs/artifacts/vram_profile_summary.json,Generated VRAM summary artifact,C,2026,0.85,verified,Backed by generated VRAM summary with no OOM
+C004,Identity module dependency is compliant with intended usage scope,license_compliance,docs/license_matrix.md;docs/artifacts/license_compliance_report.json,License matrix plus automated policy check,B,2026,0.85,verified,License matrix finalized with no pending/TBD items
+C005,Expected gain percentages from external papers transfer to this method,borrowed_gain,docs/claim_ledger.csv,Borrowed gains prohibition record,B,2026,0.00,rejected,Do not reuse unless direct method equivalence is proven

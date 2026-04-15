@@ -1,0 +1,2 @@
+experiment_id,pair_id,method_a,method_b,rater_id,brand_authenticity_score_a,brand_authenticity_score_b,creative_appeal_score_a,creative_appeal_score_b,preferred_method,blind_order
+exp_sample,pair_001,prompt_only,graph_guided,rater_01,3,6,4,6,graph_guided,b_then_a

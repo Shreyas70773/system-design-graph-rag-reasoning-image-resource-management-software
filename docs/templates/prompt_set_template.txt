@@ -1,0 +1,5 @@
+PROMPT_001: Product hero shot for summer launch with clean premium styling
+PROMPT_002: Lifestyle campaign visual highlighting product and brand colors
+PROMPT_003: Minimalist ad layout with strong identity consistency
+PROMPT_004: Social media square visual with clear text-safe region
+PROMPT_005: Story-driven brand narrative visual with high color fidelity

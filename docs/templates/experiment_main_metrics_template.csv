@@ -1,0 +1,2 @@
+experiment_id,run_id,method_name,candidate_count,success_rate,brand_score_mean,color_alignment_mean,delta_e_ciede2000_mean,delta_e_ciede2000_pass_rate_mean,latency_ms_mean,started_at,completed_at
+exp_sample,run_sample,graph_guided,120,0.9833,0.7421,0.7034,3.9123,0.4167,1820.4,2026-04-12T10:00:00Z,2026-04-12T10:30:00Z

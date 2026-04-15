@@ -1,0 +1,2 @@
+experiment_id,run_id,method_name,gpu_name,resolution,steps,sampler,precision,peak_vram_gb,avg_vram_gb,latency_ms_mean,latency_ms_median,oom_events,notes
+exp_sample,run_sample,graph_guided,RTX_5070_Ti,1024,30,euler,fp16,11.2,9.7,1820.4,1765.0,0,sparse_decode_enabled

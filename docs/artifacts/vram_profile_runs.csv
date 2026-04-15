@@ -1,0 +1,6 @@
+run_id,method,resolution,steps,sampler,precision,adapters,guidance_mode,decode_mode,batch_size,status,total_latency_s,peak_vram_gb,avg_vram_gb,oom_event,run_api_id,error
+R01,prompt_only,768,30,dpmpp_2m,fp16,none,none,none,1,completed,12.735,0.0,0.0,False,run_250ecc76c92d,
+R02,retrieval_prompt,768,30,dpmpp_2m,fp16,none,none,none,1,completed,11.3558,0.0,0.0,False,run_2d3e3afea075,
+R03,adapter_only,768,30,dpmpp_2m,fp16,control_stack_v1,none,sparse,1,completed,12.6908,0.0,0.0,False,run_37230a5a0072,
+R04,graph_guided,768,30,dpmpp_2m,fp16,control_stack_v1,proxy,sparse,1,completed,11.9219,0.0,0.0,False,run_8d2c8656b43d,
+R05,graph_guided,1024,30,dpmpp_2m,fp16,control_stack_v1,proxy,sparse,1,completed,11.2165,0.0,0.0,False,run_7699f831d3c3,

@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-04-12",
+  "scope_defaults": {
+    "unknown_dependency": "manual_review_required"
+  },
+  "python_dependencies": {
+    "fastapi": {
+      "license": "MIT",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "uvicorn": {
+      "license": "BSD-3-Clause",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "pydantic": {
+      "license": "MIT",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "pydantic-settings": {
+      "license": "MIT",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "python-dotenv": {
+      "license": "BSD-3-Clause",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "neo4j": {
+      "license": "Apache-2.0",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "httpx": {
+      "license": "BSD-3-Clause",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "requests": {
+      "license": "Apache-2.0",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "openai": {
+      "license": "Apache-2.0",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "beautifulsoup4": {
+      "license": "MIT",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "lxml": {
+      "license": "BSD-3-Clause",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "pillow": {
+      "license": "HPND",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "colorthief": {
+      "license": "MIT",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "numpy": {
+      "license": "BSD-3-Clause",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "python-multipart": {
+      "license": "Apache-2.0",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    },
+    "scipy": {
+      "license": "BSD-3-Clause",
+      "decision": "allowed",
+      "allowed_scopes": ["research", "deployment"]
+    }
+  },
+  "non_python_dependencies": {
+    "stable-diffusion-3.5-medium": {
+      "license": "Stability AI Community License",
+      "decision": "research_only",
+      "allowed_scopes": ["research"]
+    },
+    "insightface": {
+      "license": "Non-commercial/restrictive terms (verify exact variant)",
+      "decision": "research_only",
+      "allowed_scopes": ["research"]
+    },
+    "pulid": {
+      "license": "Model/path dependent, verify before deployment",
+      "decision": "research_only",
+      "allowed_scopes": ["research"]
+    },
+    "instantid-path": {
+      "license": "Mixed component licenses",
+      "decision": "manual_review_required",
+      "allowed_scopes": ["research"]
+    }
+  }
+}

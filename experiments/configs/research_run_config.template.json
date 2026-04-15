@@ -1,0 +1,26 @@
+{
+  "api_url": "http://localhost:8000",
+  "brand_id": "brand_001",
+  "experiment_id": "EXP_2026-04-12_brand_001_batch_a",
+  "prompt_file": "docs/templates/prompt_set_template.txt",
+  "methods": [
+    "prompt_only",
+    "retrieval_prompt",
+    "adapter_only",
+    "graph_guided"
+  ],
+  "seeds": [11, 22, 33],
+  "settings": {
+    "num_inference_steps": 30,
+    "guidance_scale": 7.5,
+    "aspect_ratio": "1:1",
+    "use_comfyui": false,
+    "use_proxy_color": true
+  },
+  "module_toggles": {
+    "color_regularizer": true,
+    "layout_constraint": true,
+    "identity_lock": true,
+    "dynamic_cfg": true
+  }
+}

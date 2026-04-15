@@ -1,0 +1,62 @@
+[
+  {
+    "run_id": "R01",
+    "method": "prompt_only",
+    "resolution": "768",
+    "steps": 30,
+    "sampler": "dpmpp_2m",
+    "precision": "fp16",
+    "adapters": "none",
+    "guidance_mode": "none",
+    "decode_mode": "none",
+    "batch_size": 1
+  },
+  {
+    "run_id": "R02",
+    "method": "retrieval_prompt",
+    "resolution": "768",
+    "steps": 30,
+    "sampler": "dpmpp_2m",
+    "precision": "fp16",
+    "adapters": "none",
+    "guidance_mode": "none",
+    "decode_mode": "none",
+    "batch_size": 1
+  },
+  {
+    "run_id": "R03",
+    "method": "adapter_only",
+    "resolution": "768",
+    "steps": 30,
+    "sampler": "dpmpp_2m",
+    "precision": "fp16",
+    "adapters": "control_stack_v1",
+    "guidance_mode": "none",
+    "decode_mode": "sparse",
+    "batch_size": 1
+  },
+  {
+    "run_id": "R04",
+    "method": "graph_guided",
+    "resolution": "768",
+    "steps": 30,
+    "sampler": "dpmpp_2m",
+    "precision": "fp16",
+    "adapters": "control_stack_v1",
+    "guidance_mode": "proxy",
+    "decode_mode": "sparse",
+    "batch_size": 1
+  },
+  {
+    "run_id": "R05",
+    "method": "graph_guided",
+    "resolution": "1024",
+    "steps": 30,
+    "sampler": "dpmpp_2m",
+    "precision": "fp16",
+    "adapters": "control_stack_v1",
+    "guidance_mode": "proxy",
+    "decode_mode": "sparse",
+    "batch_size": 1
+  }
+]

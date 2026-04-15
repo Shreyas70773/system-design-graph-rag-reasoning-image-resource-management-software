@@ -1,0 +1,21 @@
+{
+  "experiment_id": "EXP_2026-04-12_brand_001_batch_a",
+  "brand_id": "brand_001",
+  "prompt_set_id": "prompt_set_v1",
+  "methods": [
+    "prompt_only",
+    "retrieval_prompt",
+    "adapter_only",
+    "graph_guided"
+  ],
+  "seeds": [11, 22, 33],
+  "locked_config": {
+    "aspect_ratio": "1:1",
+    "num_inference_steps": 30,
+    "guidance_scale": 7.5,
+    "use_comfyui": false,
+    "use_proxy_color": true
+  },
+  "paired_unit_key": "brand_id|prompt_id|seed|resolution|sampler|steps",
+  "notes": "Fill with run-specific parity lock details before execution"
+}

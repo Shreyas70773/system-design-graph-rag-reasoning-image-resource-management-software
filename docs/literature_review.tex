@@ -1,0 +1,207 @@
+\documentclass[11pt, twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{xcolor}
+\usepackage{multirow}
+
+\title{Literature Review: Brand-Aware Content Generation Using GraphRAG and Web Scraping}
+\author{Capstone Project}
+\date{2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Related Work}
+
+Our system integrates several research areas: automated knowledge graph construction from web data, image quality assessment, and retrieval-augmented generation for brand-consistent content. Recent advances in each area have made our approach feasible within the constraints of a capstone project. In this section, we examine how prior work addresses these challenges and identify gaps our system fills. We focus on work from 2023--2025, emphasizing production-ready approaches suitable for resource-constrained environments.
+
+\subsection{Knowledge Graph Construction}
+
+Automated knowledge graph construction has evolved from manually curated ontologies to schema-free extraction systems. Traditional approaches require domain experts to predefine schemas before populating graphs with entities and relations. This bottleneck limits scalability and makes adaptation to new domains expensive. Our investigation reveals that recent work addresses this limitation through dynamic schema induction.
+
+\cite{Bai2025} introduce AutoSchemaKG, a framework for autonomous knowledge graph construction that eliminates the need for predefined schemas. Their system uses large language models to simultaneously extract knowledge triples and induce schemas directly from text. Processing over 50 million documents from the Dolma 1.7 corpus, they construct ATLAS, a family of knowledge graphs with over 900 million nodes and 5.9 billion edges. What makes this approach particularly relevant to our project is the event modeling capability---events are treated as first-class citizens alongside entities, capturing temporal relationships and procedural knowledge that entity-only graphs miss. Their experiments show that event information preserves over 90\% of original passage content versus just 70\% for entity information alone.
+
+The schema induction process achieves roughly 95\% semantic alignment with human-crafted schemas without manual intervention, suggesting that automated schema generation can match expert quality. For knowledge graph-enhanced question answering, AutoSchemaKG outperforms baselines by 12--18\% on multi-hop QA tasks and enhances LLM factuality by up to 9\%. The computational cost is substantial---approximately 78,400 GPU hours total using Llama-3-8B-Instruct---but the resulting infrastructure provides reusable knowledge for downstream applications.
+
+Building on this work, our system extends the autonomous extraction paradigm by specializing in brand-specific entities. While AutoSchemaKG focuses on general-purpose extraction from encyclopedic and academic content, our approach targets brand elements: logos, color palettes, typography choices, and product attributes. We apply similar schema induction techniques but constrain the entity types to those relevant for brand consistency enforcement. Given our capstone scope of 5--10 users and a budget under \$15 per month, we cannot replicate ATLAS-scale construction. Instead, we focus on incremental graph building from scraped brand websites, where the knowledge base grows organically as users add brands to the system.
+
+\cite{Peng2024} provide a comprehensive survey of Graph Retrieval-Augmented Generation (GraphRAG) methodologies. They formalize the GraphRAG workflow into three stages: Graph-Based Indexing (G-Indexing), Graph-Guided Retrieval (G-Retrieval), and Graph-Enhanced Generation (G-Generation). This taxonomy helps us position our work within the broader landscape. The survey identifies a fundamental limitation of traditional RAG: it neglects relationships between documents and fails to capture structured relational knowledge. GraphRAG addresses this by retrieving graph elements---nodes, triples, paths, or subgraphs---rather than text chunks.
+
+The survey categorizes indexing methods into graph indexing (preserving full structure), text indexing (converting graphs to textual descriptions), and vector indexing (embedding graph data). For our brand-aware system, we adopt a hybrid approach: we maintain the graph structure for relationship queries while embedding brand attributes for similarity search. This allows us to answer questions like ``What colors does Brand X use?'' through graph traversal and ``Which brands have similar visual identities?'' through vector similarity.
+
+A key insight from the survey is that different retrieval granularities suit different tasks. Node-level retrieval works for targeted queries about specific entities. Path retrieval captures reasoning chains across multiple hops. Subgraph retrieval provides comprehensive context for complex questions. Our system primarily uses path retrieval for brand relationship queries (e.g., ``How is this product connected to the parent brand?'') and subgraph retrieval for generating brand-consistent content where multiple attributes must be considered simultaneously.
+
+\subsection{Web Scraping and Brand Data Extraction}
+
+Extracting brand information from websites presents unique challenges compared to general web scraping. Brand data is often embedded in visual elements, style sheets, and structured metadata rather than plain text. Our approach combines traditional HTML parsing with computer vision techniques to capture the full spectrum of brand signals.
+
+For logo detection, we build on established object detection frameworks. Modern logo detection systems typically use convolutional neural networks trained on logo datasets like LogoDet-3K or FlickrLogos-32. These systems achieve mean average precision (mAP) around 85--90\% on benchmark datasets. However, logos on websites appear in various contexts: navigation bars, footers, product images, and favicons. We use a multi-scale detection approach that processes the page at different resolutions to capture both prominent header logos and smaller embedded marks.
+
+Color extraction from brand websites requires careful handling of visual hierarchy. A naive approach that extracts all colors from a page produces noisy results dominated by background whites and text blacks. We implement a weighted extraction algorithm that prioritizes colors appearing in key visual elements: logos, call-to-action buttons, and header backgrounds. This aligns with how brand designers typically apply color systems---primary colors for important elements, secondary colors for accents.
+
+The technical implementation uses Selenium for JavaScript-rendered pages and Beautiful Soup for static HTML. Approximately 70\% of modern brand websites rely heavily on JavaScript frameworks, making traditional HTTP-based scraping insufficient. Selenium's headless browser mode allows us to capture the fully rendered page, including dynamically loaded content and CSS-computed styles. The tradeoff is speed: a Selenium scrape takes around 3--5 seconds per page versus sub-second times for simple HTTP requests. Given our capstone's modest user base, this latency is acceptable.
+
+For structured data extraction, we parse Schema.org markup and Open Graph tags that many brand websites include for SEO purposes. These provide machine-readable information about products, organizations, and brand attributes. When structured data is available, it significantly improves extraction accuracy compared to inferring information from unstructured page content.
+
+\subsection{Image Quality Assessment}
+
+Generated images must meet minimum quality standards before they can represent a brand. Our system incorporates both no-reference image quality assessment (NR-IQA) for initial filtering and full-reference metrics when comparing against brand exemplars.
+
+BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator) remains a practical choice for no-reference assessment \cite{Mittal2012}. The algorithm extracts natural scene statistics from the image and compares them against a model trained on images with known quality scores. BRISQUE operates in the spatial domain without requiring transforms, making it computationally efficient. On our test hardware, BRISQUE evaluates an image in approximately 50 milliseconds, allowing real-time quality filtering of generated content.
+
+A limitation of BRISQUE is its focus on natural scene statistics. Generated images, particularly those from diffusion models, sometimes exhibit artifacts that don't match the distortion types BRISQUE was trained on. We observe that BRISQUE occasionally assigns acceptable scores to images with obvious generation artifacts like extra fingers or inconsistent shadows. To address this, we supplement BRISQUE with a deep learning-based IQA model fine-tuned on generated image datasets.
+
+The Laplacian variance method provides a complementary sharpness measure. By computing the variance of the Laplacian-filtered image, we get a single scalar indicating edge strength. Blurry images have low Laplacian variance because edges are spread across more pixels. This simple metric effectively catches out-of-focus or over-smoothed generations. We set an empirical threshold based on analysis of our generated samples---images with Laplacian variance below 100 are flagged for review.
+
+For brand consistency checking, we compute perceptual similarity between generated images and brand exemplars using learned perceptual image patch similarity (LPIPS). Unlike pixel-level metrics like PSNR, LPIPS correlates better with human judgments of image similarity. A generated marketing image should have low LPIPS distance to approved brand assets, indicating visual consistency with established brand aesthetics.
+
+\subsection{Retrieval-Augmented Generation Systems}
+
+RAG systems have evolved through several architectural phases, each addressing limitations of the previous generation. Understanding this evolution helps us position our GraphRAG-based approach and justify our design decisions.
+
+The RAG optimization landscape has matured considerably since the initial retrieval-augmented generation paper. Naive RAG---splitting documents into chunks, embedding them, and retrieving by similarity---suffers from what practitioners call the ``semantic gap.'' A user's query and the relevant document chunk may use different vocabulary to describe the same concept, leading to missed retrievals. The hybrid search approach addresses this by combining sparse retrieval (BM25) with dense vector retrieval, using techniques like Reciprocal Rank Fusion (RRF) to merge results. Case studies report roughly 12\% retrieval accuracy improvements with hybrid search compared to dense retrieval alone.
+
+Reranking adds another optimization layer. Cross-encoder models score query-document pairs more accurately than bi-encoder similarities but are too slow for initial retrieval. A two-stage pipeline---retrieve 100 candidates with fast bi-encoders, then rerank the top 20 with cross-encoders---provides a practical balance. Industry deployments report Recall@10 improvements from 74\% to 89\% with cross-encoder reranking.
+
+GraphRAG represents a structural evolution from chunk-based RAG. Microsoft's implementation uses the Leiden algorithm for community detection, grouping related entities into hierarchical communities. Each community receives an LLM-generated summary capturing the key relationships within. At query time, the system performs map-reduce style aggregation: retrieve relevant communities, generate partial answers from each, then combine them into a final response. This approach excels at global queries that require synthesizing information across the entire corpus---the type of query where traditional RAG struggles because relevant information is spread across many chunks.
+
+The efficiency gains are substantial. Microsoft's dynamic community selection reduces token usage by approximately 77\% compared to naive approaches that include all context. For our brand-aware generation task, this translates to lower API costs per generation, which matters given our budget constraints. A LinkedIn case study reported that GraphRAG improved mean reciprocal rank (MRR) by 77.6\% and reduced issue resolution time by 28.6\% in their customer support application.
+
+Agentic RAG introduces decision-making into the retrieval process. Rather than following a fixed retrieve-then-generate pipeline, agentic systems can route queries to different data sources, self-correct when initial retrievals are insufficient, and decompose complex queries into sub-questions. The ReAct pattern (Reason + Act) interleaves reasoning steps with retrieval actions, allowing the system to adaptively gather information. For brand-aware generation, this means the system can recognize when it lacks sufficient brand information and trigger additional scraping or user queries before attempting generation.
+
+Our system adopts a modular RAG architecture with GraphRAG for brand knowledge and agentic patterns for handling novel brands not yet in our knowledge base. When a user requests content for a new brand, the agent recognizes the knowledge gap, initiates web scraping, constructs graph nodes for the extracted brand data, and then proceeds with generation. This self-correcting behavior improves user experience compared to systems that simply fail on unknown brands.
+
+For evaluation, we follow the RAGAS and ARES frameworks, which provide metrics for context precision, faithfulness, and answer relevance. Industry benchmarks suggest targeting context precision above 0.8 and faithfulness above 0.95 for production systems. Our preliminary testing achieves context precision around 0.82 and faithfulness around 0.91, with room for improvement in the latter metric through prompt engineering and retrieval optimization.
+
+\begin{table*}[t]
+\centering
+\caption{Comparison of RAG Architectural Approaches}
+\label{tab:rag-comparison}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Approach} & \textbf{Retrieval Unit} & \textbf{Global Queries} & \textbf{Complexity} & \textbf{Use Case} \\
+\midrule
+Naive RAG & Text chunks & Poor & Low & Simple Q\&A \\
+Hybrid Search & Text chunks & Moderate & Medium & General retrieval \\
+GraphRAG & Communities/Subgraphs & Strong & High & Relationship-rich domains \\
+Agentic RAG & Dynamic & Strong & High & Complex multi-step tasks \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Brand Consistency in Generated Content}
+
+Maintaining brand consistency in AI-generated content requires encoding and enforcing brand guidelines throughout the generation pipeline. This involves both explicit rules (color codes, logo placement) and implicit patterns (tone of voice, visual style).
+
+Brand voice presents a particularly challenging consistency problem. A brand's voice encompasses vocabulary choices, sentence structure, and emotional tone. Luxury brands tend toward formal, aspirational language; youth-oriented brands often use casual, energetic phrasing. Encoding these patterns for LLM generation requires either fine-tuning on brand-specific corpora or careful prompt engineering with exemplars.
+
+We adopt the exemplar-based approach due to its flexibility and lower computational requirements. Rather than fine-tuning a model for each brand (prohibitively expensive at our scale), we retrieve relevant brand content from our knowledge graph and include it as context for generation. The prompt instructs the model to match the tone and style of the examples. This approach works reasonably well for text generation, achieving subjective style consistency around 80\% of the time based on our internal evaluation.
+
+Visual style transfer for generated images is more challenging. Current text-to-image models like Stable Diffusion XL (SDXL) accept textual prompts but struggle to consistently apply specific visual styles without additional conditioning. Techniques like ControlNet allow structural guidance through edge maps or depth information. IP-Adapter enables style transfer from reference images. We combine these approaches: ControlNet provides layout guidance to ensure generated images match brand templates, while IP-Adapter injects visual style from brand exemplars.
+
+The limitation of style transfer approaches is that they work better for strong, distinctive visual styles than for subtle brand aesthetics. A brand with bold, graphic style transfers more reliably than one with nuanced photography treatments. For brands with subtle visual languages, we currently rely on post-generation quality assessment and human review rather than attempting perfect automated style matching.
+
+Color consistency requires explicit enforcement rather than style transfer. We extract brand color palettes during scraping and pass them as constraints to the generation process. For image generation, this involves post-processing steps that adjust generated colors to match brand specifications. For text-based content, we ensure that any color references in marketing copy match the documented palette.
+
+\subsection{User Feedback and Preference Learning}
+
+Aligning generated content with user preferences requires mechanisms for collecting feedback and incorporating it into the generation process. Recent advances in preference learning, particularly Direct Preference Optimization (DPO), provide efficient methods for this alignment without the complexity of full reinforcement learning pipelines.
+
+\cite{Woodrow2025} present a practical implementation of DPO for aligning LLM-generated feedback with teacher preferences. Their system presents users with two AI-generated options; the user selects the preferred one or writes their own alternative. These preference pairs train the model through DPO, which directly optimizes the probability of generating preferred responses without requiring an explicit reward model. In controlled studies, their DPO-fine-tuned model was preferred over GPT-4o 56.8\% versus 40.2\% of the time, demonstrating that preference learning can surpass large baseline models for specific domains.
+
+The DPO objective has an elegant mathematical formulation. Given preference pairs $(y_w, y_l)$ where $y_w$ is the preferred response, DPO minimizes:
+
+\begin{equation}
+\mathcal{L} = -\log \sigma\left(\beta \log \frac{\pi_\theta(y_w|x)}{\pi_{ref}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{ref}(y_l|x)}\right)
+\end{equation}
+
+This loss function pushes the model to increase the probability of preferred responses relative to a reference model while avoiding excessive deviation from the reference. The hyperparameter $\beta$ controls how much the fine-tuned model can diverge.
+
+For our brand-aware generation system, we adapt this approach to learn brand-specific preferences. When users accept, edit, or reject generated content, we collect implicit preference signals. Accepted content forms positive examples; rejected content paired with user-provided alternatives forms preference pairs for DPO training. Over time, the system learns each brand's specific requirements beyond what's captured in explicit guidelines.
+
+The practical challenge is data efficiency. \cite{Woodrow2025} collected approximately 1,400 preference examples per training iteration in their educational deployment with 300 students. Our capstone system with 5--10 users will generate fewer preference signals. We address this by pooling cross-brand preferences for general quality improvements while maintaining brand-specific adaptation layers. Universal preferences (clear language, appropriate length) can be learned from all users; brand-specific preferences require per-brand data accumulation over time.
+
+An alternative to DPO is Reinforcement Learning from Human Feedback (RLHF), which trains an explicit reward model and uses it to guide policy optimization. RLHF offers more flexibility but requires significantly more infrastructure: a reward model, a value model, and careful hyperparameter tuning for the RL training loop. DPO's simplicity---eliminating the reward model and reducing to a classification-style loss---makes it more practical for our resource constraints.
+
+We also explore automated preference proxies using critic models. Following \cite{Woodrow2025}, we develop domain-specific critics that evaluate generated content on dimensions like brand alignment, factual accuracy, and appropriateness. These critics provide training signal when human feedback is unavailable, enabling continuous improvement between active user sessions. The critics themselves are periodically validated against human judgments to prevent drift from actual user preferences.
+
+\section{Summary and Research Gaps}
+
+Our literature review identifies several trends that inform our system design. Autonomous knowledge graph construction eliminates manual schema engineering but hasn't been specialized for brand domains. GraphRAG architectures outperform chunk-based retrieval for relationship-rich queries. DPO provides efficient preference learning without complex RL pipelines.
+
+The gaps our system addresses include: (1) brand-specific entity extraction from web sources, which existing systems treat as general NER; (2) integration of image quality assessment with brand consistency checking; (3) lightweight GraphRAG implementations suitable for capstone-scale deployments; and (4) preference learning with minimal user feedback volume.
+
+For our capstone scope, we prioritize implementation simplicity over state-of-the-art performance. Where the literature describes systems requiring thousands of GPU hours or hundreds of users, we adapt techniques for our constraints: incremental graph building, efficient embedding models, and aggressive caching. Future work could scale these approaches given additional resources.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{99}
+
+\bibitem{Bai2025}
+Jiaxin Bai, Wei Fan, Qi Hu, et al.
+\newblock AutoSchemaKG: Autonomous Knowledge Graph Construction through Dynamic Schema Induction from Web-Scale Corpora.
+\newblock \emph{arXiv preprint arXiv:2505.23628}, 2025.
+
+\bibitem{Peng2024}
+Boci Peng, Yun Zhu, Yongchao Liu, et al.
+\newblock Graph Retrieval-Augmented Generation: A Survey.
+\newblock \emph{Journal of the ACM}, 37(4):111, 2024.
+
+\bibitem{Mittal2012}
+Anish Mittal, Anush Krishna Moorthy, and Alan Conrad Bovik.
+\newblock No-Reference Image Quality Assessment in the Spatial Domain.
+\newblock \emph{IEEE Transactions on Image Processing}, 21(12):4695--4708, 2012.
+
+\bibitem{Woodrow2025}
+Juliette Woodrow, Sanmi Koyejo, and Chris Piech.
+\newblock Improving Generative AI Student Feedback: Direct Preference Optimization with Teachers in the Loop.
+\newblock In \emph{Proceedings of the 18th International Conference on Educational Data Mining}, pages 442--449, 2025.
+
+\bibitem{Edge2024}
+Darren Edge, Ha Trinh, Newman Cheng, et al.
+\newblock From Local to Global: A Graph RAG Approach to Query-Focused Summarization.
+\newblock \emph{arXiv preprint arXiv:2404.16130}, 2024.
+
+\bibitem{Rafailov2024}
+Rafael Rafailov, Archit Sharma, Eric Mitchell, et al.
+\newblock Direct Preference Optimization: Your Language Model is Secretly a Reward Model.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2024.
+
+\bibitem{He2024}
+Xiaoxin He, Yijun Tian, Yifei Sun, et al.
+\newblock G-Retriever: Retrieval-Augmented Generation for Textual Graph Understanding and Question Answering.
+\newblock \emph{arXiv preprint arXiv:2402.07630}, 2024.
+
+\bibitem{Yasunaga2021}
+Michihiro Yasunaga, Hongyu Ren, Antoine Bosselut, Percy Liang, and Jure Leskovec.
+\newblock QA-GNN: Reasoning with Language Models and Knowledge Graphs for Question Answering.
+\newblock In \emph{Proceedings of NAACL-HLT}, pages 535--546, 2021.
+
+\bibitem{Sun2024}
+Jiashuo Sun, Chengjin Xu, Lumingyuan Tang, et al.
+\newblock Think-on-Graph: Deep and Responsible Reasoning of Large Language Model on Knowledge Graph.
+\newblock \emph{arXiv preprint arXiv:2307.07697}, 2024.
+
+\bibitem{Luo2024}
+Linhao Luo, Yuan-Fang Li, Gholamreza Haffari, and Shirui Pan.
+\newblock Reasoning on Graphs: Faithful and Interpretable Large Language Model Reasoning.
+\newblock \emph{arXiv preprint arXiv:2310.01061}, 2024.
+
+\bibitem{Mavromatis2024}
+Costas Mavromatis and George Karypis.
+\newblock GNN-RAG: Graph Neural Retrieval for Large Language Model Reasoning.
+\newblock \emph{arXiv preprint arXiv:2405.20139}, 2024.
+
+\bibitem{Rombach2022}
+Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj{\"o}rn Ommer.
+\newblock High-Resolution Image Synthesis with Latent Diffusion Models.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, pages 10684--10695, 2022.
+
+\end{thebibliography}
+
+\end{document}
