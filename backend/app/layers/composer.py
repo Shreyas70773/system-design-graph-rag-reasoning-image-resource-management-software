@@ -1,7 +1,7 @@
 """Initial full-image composition — real backends only (no fake product art).
 
 Priority ladder (first success wins):
-  1. OpenRouter Nano Banana  (OPENROUTER_API_KEY) — `google/gemini-2.5-flash-image`
+    1. OpenRouter GPT-5 Image (OPENROUTER_API_KEY) — `openai/gpt-5-image`
      Strong text-in-image + brand reasoning, and matches the inpainting backend
      so the canvas and the edits share the same visual language.
   2. Replicate FLUX Schnell  (REPLICATE_API_TOKEN)
@@ -27,7 +27,21 @@ from app.rendering.storage import put_bytes
 logger = logging.getLogger(__name__)
 
 _FLUX_SCHNELL = "black-forest-labs/flux-schnell"
-_OPENROUTER_MODEL = "google/gemini-2.5-flash-image"
+_OPENROUTER_MODEL = os.environ.get("OPENROUTER_IMAGE_MODEL", "openai/gpt-5-image")
+
+
+def _openrouter_modalities_for_model(model_id: str) -> List[str]:
+    override = os.environ.get("OPENROUTER_IMAGE_MODALITIES", "").strip()
+    if override:
+        parsed = [token.strip() for token in override.split(",") if token.strip()]
+        if parsed:
+            return parsed
+
+    normalized = (model_id or "").strip().lower()
+    if normalized.startswith("bytedance-seed/seedream"):
+        return ["image"]
+
+    return ["image", "text"]
 
 
 def _build_prompt(base: str, conditioning: Dict[str, Any]) -> str:
@@ -113,12 +127,15 @@ async def _try_openrouter(conditioned_prompt: str) -> Optional[Dict[str, Any]]:
     if not api_key:
         return None
 
+    modalities = _openrouter_modalities_for_model(_OPENROUTER_MODEL)
     payload = {
         "model": _OPENROUTER_MODEL,
         "messages": [{"role": "user", "content": conditioned_prompt}],
-        "modalities": ["image", "text"],
-        "max_tokens": 8192,
+        "modalities": modalities,
     }
+    if "text" in modalities:
+        payload["max_tokens"] = 8192
+
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
@@ -131,6 +148,19 @@ async def _try_openrouter(conditioned_prompt: str) -> Optional[Dict[str, Any]]:
             headers=headers,
             json=payload,
         )
+        if (
+            response.status_code == 404
+            and "requested output modalities" in (response.text or "").lower()
+            and payload.get("modalities") != ["image"]
+        ):
+            payload["modalities"] = ["image"]
+            payload.pop("max_tokens", None)
+            response = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload,
+            )
+
         if response.status_code != 200:
             raise RuntimeError(f"OpenRouter HTTP {response.status_code}: {response.text[:500]}")
 
@@ -180,7 +210,7 @@ async def compose_image_async(
     conditioned = _build_prompt(prompt, brand_conditioning)
     attempts: List[str] = []
 
-    # 1 — OpenRouter Nano Banana (primary)
+    # 1 — OpenRouter GPT-5 Image (primary)
     try:
         out = await _try_openrouter(conditioned)
         if out:
@@ -220,8 +250,8 @@ async def compose_image_async(
         logger.warning("Marketing pipeline compose failed: %s", exc)
 
     raise RuntimeError(
-        "Could not generate an image. Tried: OpenRouter Nano Banana → Replicate FLUX → Comfy/HF SDXL. "
+        "Could not generate an image. Tried: OpenRouter GPT-5 Image → Replicate FLUX → Comfy/HF SDXL. "
         f"Details: {'; '.join(attempts)}. "
-        "Ensure OPENROUTER_API_KEY has access to google/gemini-2.5-flash-image, "
+        "Ensure OPENROUTER_API_KEY has access to openai/gpt-5-image, "
         "or add Replicate billing, or run ComfyUI + FLUX / set HUGGINGFACE_TOKEN for SDXL fallback."
     )

@@ -1300,8 +1300,8 @@ class OpenRouterGenerator(ImageGenerator):
     """
     OpenRouter Implementation for Image Generation
     ===============================================
-    Uses OpenRouter's unified API to access various image generation models
-    including nano-banana-2.5-flash-preview and other multimodal models.
+    Uses OpenRouter's unified API to access various image generation models,
+    defaulting to OpenAI GPT-5 Image.
     
     OpenRouter provides access to many providers through a single API,
     making it ideal for fallback and model experimentation.
@@ -1311,16 +1311,32 @@ class OpenRouterGenerator(ImageGenerator):
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
         self.base_url = "https://openrouter.ai/api/v1"
         self.provider = "openrouter"
+
+        configured_default = os.getenv("OPENROUTER_IMAGE_MODEL", "openai/gpt-5-image")
         
-        # Models that support image generation
-        # Use GA version which is verified to work with modalities: ["image", "text"]
+        # Models that support image generation.
         self.models = {
-            "nano-banana": "google/gemini-2.5-flash-image",  # GA version - verified working
+            "gpt-5-image": configured_default,
+            "seedream-4.5": "bytedance-seed/seedream-4.5",
+            "nano-banana": "google/gemini-2.5-flash-image",
             "nano-banana-preview": "google/gemini-2.5-flash-image-preview",  # Preview version
             "gemini-flash": "google/gemini-flash-1.5",  # Text only
         }
         
-        self.default_model = "nano-banana"
+        self.default_model = "gpt-5-image"
+
+    def _resolve_modalities(self, model_id: str) -> List[str]:
+        override = os.getenv("OPENROUTER_IMAGE_MODALITIES", "").strip()
+        if override:
+            parsed = [token.strip() for token in override.split(",") if token.strip()]
+            if parsed:
+                return parsed
+
+        normalized = (model_id or "").strip().lower()
+        if normalized.startswith("bytedance-seed/seedream"):
+            return ["image"]
+
+        return ["image", "text"]
     
     async def generate(
         self, 
@@ -1339,7 +1355,12 @@ class OpenRouterGenerator(ImageGenerator):
         
         try:
             compiled_prompt = self.compile_prompt(request)
-            model_id = self.models.get(model or self.default_model, self.models["nano-banana"])
+            requested_model = model or self.default_model
+            model_id = self.models.get(requested_model)
+            if model_id is None:
+                model_id = requested_model if "/" in requested_model else self.models[self.default_model]
+
+            modalities = self._resolve_modalities(model_id)
             
             # OpenRouter requires modalities parameter for image generation
             # According to docs: https://openrouter.ai/docs/guides/overview/multimodal/image-generation
@@ -1351,9 +1372,10 @@ class OpenRouterGenerator(ImageGenerator):
                         "content": compiled_prompt
                     }
                 ],
-                "modalities": ["image", "text"],  # Required for image generation!
-                "max_tokens": 8192,
+                "modalities": modalities,
             }
+            if "text" in modalities:
+                payload["max_tokens"] = 8192
             
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
@@ -1368,6 +1390,19 @@ class OpenRouterGenerator(ImageGenerator):
                     headers=headers,
                     json=payload
                 )
+
+                if (
+                    response.status_code == 404
+                    and "requested output modalities" in (response.text or "").lower()
+                    and payload.get("modalities") != ["image"]
+                ):
+                    payload["modalities"] = ["image"]
+                    payload.pop("max_tokens", None)
+                    response = await client.post(
+                        f"{self.base_url}/chat/completions",
+                        headers=headers,
+                        json=payload
+                    )
                 
                 if response.status_code != 200:
                     error_text = response.text
