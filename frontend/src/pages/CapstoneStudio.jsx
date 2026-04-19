@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   AlertCircle,
   CheckCircle2,
@@ -45,6 +46,7 @@ const REFINEMENT_PROFILES = {
 }
 
 export default function CapstoneStudio() {
+  const location = useLocation()
   const imageRef = useRef(null)
   const [capabilities, setCapabilities] = useState(null)
   const [presets, setPresets] = useState(null)
@@ -73,6 +75,12 @@ export default function CapstoneStudio() {
         ])
         setCapabilities(caps)
         setPresets(accuracy)
+        
+        // If a scene ID is passed via navigation state, load it
+        if (location.state?.sceneId) {
+          const scene = await getCapstoneScene(location.state.sceneId)
+          setScene(scene)
+        }
       } catch (err) {
         setError(err.message)
       }

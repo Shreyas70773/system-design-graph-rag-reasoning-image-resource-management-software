@@ -4,9 +4,10 @@ import {
   Sparkles, Image, Type, Wand2, 
   Loader2, ArrowRight, AlertCircle, Package, Check, Layout,
   Brain, Zap, Eye, History, User, ChevronDown, Copy, Linkedin, Download, Search, 
-  Lightbulb, TrendingUp, Calendar, FileText, X
+  Lightbulb, TrendingUp, Calendar, FileText, X, Edit3
 } from 'lucide-react'
 import { getBrand, generateContent, generateAdvancedContent, getBrandProducts, getLearnedPreferences, getBrandDNA, generateWithBrandDNA, discoverTrendingTopics, generateContentIdeas, generateLinkedInPostAI } from '../services/api'
+import { uploadCapstoneScene } from '../services/apiV3'
 
 // Text layout options
 const TEXT_LAYOUTS = [
@@ -295,6 +296,37 @@ export default function Generate() {
       link.href = result.image_url
       link.download = `${brand?.name || 'brand'}-content.png`
       link.click()
+    }
+  }
+  
+  const handleEditInStudio = async () => {
+    if (!result?.image_url) return
+    
+    try {
+      setGenerating(true)
+      
+      // Fetch the image and convert to blob
+      const response = await fetch(result.image_url)
+      const blob = await response.blob()
+      const file = new File(blob, `${brand?.name || 'brand'}-generated.png`, { type: 'image/png' })
+      
+      // Upload to Studio
+      const uploadResponse = await uploadCapstoneScene(file, {
+        title: `${brand?.name} - ${new Date().toLocaleDateString()}`,
+        ownerUserId: brandId
+      })
+      
+      if (uploadResponse?.scene_id) {
+        // Navigate to Studio with the scene loaded
+        navigate(`/capstone`, { state: { sceneId: uploadResponse.scene_id } })
+      } else {
+        setError('Failed to upload image to editor. Please try again.')
+      }
+    } catch (err) {
+      console.error('Error uploading to studio:', err)
+      setError(`Failed to upload to editor: ${err.message}`)
+    } finally {
+      setGenerating(false)
     }
   }
   
@@ -1289,13 +1321,30 @@ export default function Generate() {
                     <Image className="w-5 h-5 text-primary-600" />
                     Generated Image
                   </h3>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={handleDownloadImage}
                       className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
                     >
                       <Download className="w-4 h-4" />
                       Download
+                    </button>
+                    <button
+                      onClick={handleEditInStudio}
+                      disabled={generating}
+                      className="text-sm bg-primary-600 text-white px-3 py-1 rounded-lg hover:bg-primary-700 flex items-center gap-1 disabled:opacity-50"
+                    >
+                      {generating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Edit3 className="w-4 h-4" />
+                          Edit in Studio
+                        </>
+                      )}
                     </button>
                     {(result.headline || result.body_copy) && (
                       <button
