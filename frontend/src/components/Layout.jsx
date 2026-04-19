@@ -43,30 +43,6 @@ export default function Layout() {
               </Link>
 
               <Link
-                to="/research"
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location.pathname.startsWith('/research')
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                <FlaskConical className="w-4 h-4" />
-                Research Lab
-              </Link>
-
-              <Link
-                to="/v2"
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location.pathname.startsWith('/v2')
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                <Layers className="w-4 h-4" />
-                Layer Studio
-              </Link>
-
-              <Link
                 to="/capstone"
                 className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname.startsWith('/capstone')
@@ -75,7 +51,7 @@ export default function Layout() {
                 }`}
               >
                 <Wand2 className="w-4 h-4" />
-                Capstone Studio
+                Studio
               </Link>
             </nav>
           </div>
@@ -91,7 +67,7 @@ export default function Layout() {
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-gray-500 text-sm">
-            Brand-Aligned Content Generation Platform — Capstone Project
+            Brand-Aligned Content Generation Platform
           </p>
         </div>
       </footer>

@@ -374,10 +374,10 @@ export default function CapstoneStudio() {
               <Sparkles className="h-3.5 w-3.5" />
               GraphRAG Image Manipulation Platform
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight">Capstone Studio</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Content Editor</h1>
             <p className="max-w-3xl text-sm text-slate-200">
-              Upload a photo, click to segment an object with SAM 2, then remove it with Big-LaMa while
-              preserving a persistent scene graph and edit history.
+              Upload a photo, click to segment an object, then remove it while preserving a persistent
+              scene graph and edit history.
             </p>
           </div>
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg transition hover:bg-cyan-300">
@@ -413,7 +413,7 @@ export default function CapstoneStudio() {
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">Interactive Canvas</h2>
                 <p className="text-sm text-slate-500">
-                  Click for point-guided SAM2, or draw a rough lasso and release to auto-snap object edges.
+                  Click to select an object, or draw a rough outline and release to auto-snap object edges.
                 </p>
               </div>
               {busy ? (
@@ -557,7 +557,7 @@ export default function CapstoneStudio() {
               <div className="flex min-h-[520px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center text-slate-500">
                 <div className="space-y-3 px-6">
                   <ImagePlus className="mx-auto h-10 w-10 text-slate-400" />
-                  <p className="text-sm">Upload a test image to start the real SAM 2 + LaMa workflow.</p>
+                  <p className="text-sm">Upload an image to start editing and removing objects.</p>
                 </div>
               </div>
             )}
@@ -692,11 +692,11 @@ function StatusCard({ capabilities }) {
     <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center gap-2">
         <Cpu className="h-4 w-4 text-slate-700" />
-        <h2 className="text-lg font-semibold text-slate-900">Local Runtime</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Processing</h2>
       </div>
       <div className="space-y-3 text-sm">
-        <CapabilityRow name="SAM 2" status={capabilities?.sam2?.ready} detail={capabilities?.sam2?.device} />
-        <CapabilityRow name="Big-LaMa" status={capabilities?.lama?.ready} detail={capabilities?.lama?.device} />
+        <CapabilityRow name="Segmentation" status={capabilities?.sam2?.ready} detail={capabilities?.sam2?.device} />
+        <CapabilityRow name="Inpainting" status={capabilities?.lama?.ready} detail={capabilities?.lama?.device} />
       </div>
     </div>
   )

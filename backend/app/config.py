@@ -56,10 +56,10 @@ class Settings(BaseSettings):
     research_mode_enabled: bool = True
 
     # Image generation backend policy
-    # Keep Google/OpenRouter image models off by default to enforce diffusion-first experimentation.
+    # Default to OpenRouter image models for production generation reliability.
     allow_google_image_models: bool = False
-    allow_openrouter_image_models: bool = False
-    image_provider_priority: str = "replicate,fal.ai"
+    allow_openrouter_image_models: bool = True
+    image_provider_priority: str = "openrouter,replicate,fal.ai"
     
     # Cloudflare R2 (optional)
     cloudflare_account_id: Optional[str] = None
