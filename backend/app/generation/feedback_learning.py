@@ -538,7 +538,7 @@ class FeedbackLearningEngine:
         
         preferences = []
         try:
-            results = await self.db.execute_query(query, {
+            results = self.db.execute_query(query, {
                 "brand_id": brand_id,
                 "min_conf": min_confidence
             })
