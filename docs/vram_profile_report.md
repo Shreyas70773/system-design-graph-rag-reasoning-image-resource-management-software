@@ -18,6 +18,7 @@ Generated artifacts:
 - `docs/artifacts/vram_profile_runs.csv`
 - `docs/artifacts/vram_profile_summary.json`
 - `docs/artifacts/vram_profile_report_generated.md`
+- ``
 
 Note:
 - Use `--dry-run` to validate pipeline wiring before live API execution.

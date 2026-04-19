@@ -40,3 +40,13 @@ htmlcov/
 
 # Runtime uploads/artifacts
 uploads/
+
+# Local model weights/checkpoints (downloaded via bootstrap scripts)
+backend/checkpoints/
+models/big-lama/
+models/**/*.ckpt
+models/**/*.pt
+models/**/*.pth
+*.ckpt
+*.pt
+*.pth

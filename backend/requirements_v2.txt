@@ -1,0 +1,65 @@
+# V2 additional dependencies. Install alongside requirements.txt:
+#   pip install -r backend/requirements.txt -r backend/requirements_v2.txt
+#
+# Targets Python 3.11, CUDA 12.1+, Windows or WSL2.
+# All pins are "known good" at time of spec lock (2026-04-17). Upgrades go
+# through a PR that updates MODEL_STACK_V2.md and reruns vram_profile_v2.py.
+
+# --- Core ML infrastructure ---
+torch>=2.3.0,<2.6.0
+torchvision>=0.18.0,<0.21.0
+xformers>=0.0.26
+accelerate>=0.31.0
+bitsandbytes>=0.43.0       # NF4 / 4-bit quantisation for FLUX
+safetensors>=0.4.3
+
+# --- Diffusion and conditioning ---
+diffusers>=0.29.0
+transformers>=4.44.0
+peft>=0.11.0               # LoRAs / adapters
+controlnet_aux>=0.0.9      # Depth/normal preprocessing helpers
+
+# --- Vision models (Pipeline A & C) ---
+timm>=1.0.0
+open-clip-torch>=2.24.0
+# GroundingDINO + SAM 2.1 installed via HF / direct repo:
+# pip install git+https://github.com/IDEA-Research/GroundingDINO.git
+# pip install git+https://github.com/facebookresearch/sam2.git
+
+# --- 3D / mesh ---
+trimesh>=4.4.0
+pygltflib>=1.16.0
+pyrender>=0.1.45           # For CLIP re-render validation
+# TRELLIS via: pip install git+https://github.com/microsoft/TRELLIS.git
+# SAM 3D Body via: pip install git+https://github.com/facebookresearch/sam3d.git
+
+# --- Color science (LAB grading) ---
+scikit-image>=0.23.0
+colorspacious>=1.1.2
+
+# --- VLM (Qwen2.5-VL) ---
+autoawq>=0.2.6             # AWQ quantisation runtime
+
+# --- FLUX + PuLID-FLUX ---
+# FLUX and PuLID-FLUX are pulled via HF at runtime; no pip entry needed.
+# sentencepiece is required by FLUX's text encoder.
+sentencepiece>=0.2.0
+einops>=0.8.0
+
+# --- IC / delighting ---
+# IntrinsicAnything via HF.
+
+# --- Blender bridge ---
+# Blender 4.2+ installed separately; invoked as subprocess.
+
+# --- Graph & I/O ---
+# neo4j is already pinned in requirements.txt.
+
+# --- Stats, benchmarking (research) ---
+scipy>=1.13.0              # statistics module already used in V1
+matplotlib>=3.9.0
+
+# --- Dev / CI ---
+pytest>=8.2.0
+pytest-asyncio>=0.23.0
+ruff>=0.5.0

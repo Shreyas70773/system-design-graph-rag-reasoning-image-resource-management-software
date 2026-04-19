@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Sparkles, Home, FlaskConical } from 'lucide-react'
+import { Sparkles, Home, FlaskConical, Layers, Wand2 } from 'lucide-react'
 import { setActiveBrandId } from '../services/brandSession'
 
 export default function Layout() {
@@ -52,6 +52,30 @@ export default function Layout() {
               >
                 <FlaskConical className="w-4 h-4" />
                 Research Lab
+              </Link>
+
+              <Link
+                to="/v2"
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname.startsWith('/v2')
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <Layers className="w-4 h-4" />
+                Layer Studio
+              </Link>
+
+              <Link
+                to="/capstone"
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname.startsWith('/capstone')
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <Wand2 className="w-4 h-4" />
+                Capstone Studio
               </Link>
             </nav>
           </div>

@@ -1,0 +1,21 @@
+{
+  "name": "patterned-floor-object-removal",
+  "scene_id": "replace-me",
+  "object_id": "replace-me",
+  "segmentation_tuning": {
+    "multimask_strategy": "largest_mask",
+    "dilate_px": 2,
+    "erode_px": 0,
+    "keep_largest_component": true,
+    "min_area_fraction": 0.002
+  },
+  "inpaint_tuning": {
+    "mask_dilate_px": 8,
+    "neighbor_limit": 6,
+    "preserve_text_regions": true
+  },
+  "notes": [
+    "Use when SAM slightly under-covers the object silhouette.",
+    "Compare against the balanced preset and log visible halo reduction."
+  ]
+}

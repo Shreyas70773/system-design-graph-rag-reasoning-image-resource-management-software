@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     cloudflare_r2_public_base_url: Optional[str] = None
     
     class Config:
-        env_file = "C:/Users/bukka/system-design-capstone/backend/.env"
+        env_file = _env_path
         env_file_encoding = "utf-8"
         extra = "ignore"  # Ignore any extra env vars
 

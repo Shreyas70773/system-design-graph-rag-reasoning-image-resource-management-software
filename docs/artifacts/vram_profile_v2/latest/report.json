@@ -1,0 +1,92 @@
+[
+  {
+    "model": "qwen_vl",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 6453,
+    "peak_vram_mb": 6400,
+    "budget_mb": 6400,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "grounding_sam",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 2000,
+    "peak_vram_mb": 5400,
+    "budget_mb": 5400,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "intrinsic",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 2342,
+    "peak_vram_mb": 6144,
+    "budget_mb": 6144,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "trellis",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 1953,
+    "peak_vram_mb": 10240,
+    "budget_mb": 10240,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "sam3d_body",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 2250,
+    "peak_vram_mb": 6144,
+    "budget_mb": 6144,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "flux_schnell",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 1937,
+    "peak_vram_mb": 10240,
+    "budget_mb": 10240,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "pulid_flux",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 1891,
+    "peak_vram_mb": 11300,
+    "budget_mb": 11300,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "controlnet_union",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 2000,
+    "peak_vram_mb": 1900,
+    "budget_mb": 1900,
+    "overrun_pct": 0.0,
+    "error": null
+  },
+  {
+    "model": "ipadapter_flux",
+    "status": "MOCK",
+    "load_ms": null,
+    "infer_ms": 1906,
+    "peak_vram_mb": 900,
+    "budget_mb": 900,
+    "overrun_pct": 0.0,
+    "error": null
+  }
+]

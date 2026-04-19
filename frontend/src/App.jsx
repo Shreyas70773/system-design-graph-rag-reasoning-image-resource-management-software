@@ -10,6 +10,8 @@ import ResultsAdvanced from './pages/ResultsAdvanced'
 import History from './pages/History'
 import LinkedIn from './pages/LinkedIn'
 import ResearchLab from './pages/ResearchLab'
+import V2Studio from './pages/V2Studio'
+import CapstoneStudio from './pages/CapstoneStudio'
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Route path="linkedin" element={<BrandRouteRedirect targetPath="linkedin" />} />
         <Route path="linkedin/:brandId" element={<LinkedIn />} />
         <Route path="research" element={<ResearchLab />} />
+        <Route path="v2" element={<V2Studio />} />
+        <Route path="capstone" element={<CapstoneStudio />} />
       </Route>
     </Routes>
   )
